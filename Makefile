@@ -1,0 +1,27 @@
+CC=g++
+CC_MINGW64VSC =..\TOOLS\mingw64\bin\g++
+
+APP_SRC = ./src/App.cpp ./src/Renderer.cpp ./src/main.cpp ./src/Camera.cpp ./glad/src/glad.c
+IMGUI_SRC = imGUI/imgui/imgui.cpp imGUI/imgui/imgui_draw.cpp imGUI/imgui/imgui_widgets.cpp imGUI/imgui/imgui_tables.cpp \
+    imGUI/imgui/backends/imgui_impl_glfw.cpp imGUI/imgui/backends/imgui_impl_opengl3.cpp 
+WINOPT = -lglu32 -lopengl32 -static -lstdc++ -lgcc
+
+all:win64
+
+win64:
+	$(CC_MINGW64VSC) $(APP_SRC)  -I. -I./include -I./imGUI  -I./glm -I./glad/include \
+	-DWIN32  $(IMGUI_SRC)  \
+	./GLFW/lib64/libglfw3dll.a  $(WINOPT) \
+	-o app.exe
+
+linux:
+	$(CC)  $(APP_SRC) $(IMGUI_SRC) -I. -I./include -I./imGUI  -I./glm -I./glad/include \
+	-I/usr/X11R6/include \
+	-std=c++17 \
+    -Wall -Wextra \
+    -lglfw -lGL -ldl \
+	-DIMGUI_IMPL_OPENGL_LOADER_GLAD \
+	-o app.exe
+
+clean:
+	rm *.o *.exe
