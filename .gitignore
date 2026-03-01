@@ -1,0 +1,9 @@
+/build/
+*.o
+*.exe
+*.dll
+*.so
+*.pyc
+*.log
+# Windows が作る zone.identifier ファイルを無視
+*Zone.Identifier
