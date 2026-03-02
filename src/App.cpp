@@ -1,17 +1,24 @@
 #include "App.h"
-
 #include <GLFW/glfw3.h>
-#include <glad/glad.h>
+
+
 #include <iostream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
 #include "imGUI/imgui.h"
 #include "imGUI/imgui_impl_glfw.h"
 #include "imGUI/imgui_impl_opengl3.h"
 
 #include "Renderer.h"
 
+//#define __EMSCRIPTEN__ //Web用
+
+#ifdef __EMSCRIPTEN__
+    #include <GLES3/gl3.h>
+    #include <emscripten.h>
+#else
+    #include <glad/glad.h>
+#endif
 
 // カメラ用
 static float fov = 45.0f;
@@ -27,16 +34,29 @@ App::~App()
 {
 }
 
+
+void loopProxy(void* arg)
+{
+    static_cast<App*>(arg)->mainLoop();
+}
+
 int App::run()
 {
     if (!init())
         return -1;
 
-    mainLoop();
-    shutdown();
+    #ifdef __EMSCRIPTEN__
+        emscripten_set_main_loop_arg(loopProxy, this, 0, true);
+    #else
+        while (!glfwWindowShouldClose(window)) {
+            mainLoop();
+        }
+        shutdown();
+    #endif
 
     return 0;
 }
+
 void setup_imgui(GLFWwindow* window)
 {
     // Setup Dear ImGui context
@@ -56,7 +76,11 @@ void setup_imgui(GLFWwindow* window)
     //ImGui_ImplGlfwGL3_Init(window, true);
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     const char* glsl_version = "#version 130";
-    ImGui_ImplOpenGL3_Init(glsl_version);
+    #ifdef __EMSCRIPTEN__
+        ImGui_ImplOpenGL3_Init("#version 300 es");//for emcc web用
+    #else
+        ImGui_ImplOpenGL3_Init(glsl_version);//PC用
+    #endif
 }
 
 bool App::init()
@@ -80,11 +104,15 @@ bool App::init()
 
     glfwMakeContextCurrent(window);
 
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        std::cerr << "Failed to init GLAD\n";
-        return false;
-    }
+    #ifdef __EMSCRIPTEN__
+    // WebではGLAD不要
+    #else
+        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+        {
+            std::cerr << "Failed to init GLAD\n";
+            return false;
+        }
+    #endif
     
     // ここでレンダリング初期化（GLコンテキスト後！）
     if (!renderer.init(800,600))
@@ -109,12 +137,8 @@ bool App::init()
 
 void App::mainLoop()
 {
-    
-    while (!glfwWindowShouldClose(window))
-    {
-        glfwPollEvents();
+    glfwPollEvents();
 
-        // ---- ここに既存の描画処理 ----
     // ImGUIフレーム開始
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -131,11 +155,21 @@ void App::mainLoop()
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-   
+    
     // 3D描画
-
+    glEnable(GL_DEPTH_TEST);
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);
+    glViewport(0, 0, width, height);
+
+    if (height > 0) {
+        glm::mat4 p = glm::perspective(
+        glm::radians(45.0f),
+        (float)width / (float)height,
+        0.1f,
+        100.0f);
+        renderer.setProjection(p);
+    }
     
     float time = glfwGetTime();
     float currentFrame = time;
@@ -163,28 +197,31 @@ void App::mainLoop()
     // 描画
     // 面
     glEnable(GL_POLYGON_OFFSET_FILL);
+    #ifndef __EMSCRIPTEN__
     glPolygonOffset(1.0f,1.0f);
+    #endif
     renderer.draw(cube, model1, glm::vec3(0.8f,0.2f,0.2f));
     renderer.draw(cyl,  model2, glm::vec3(0.2f,0.8f,0.2f));
     renderer.draw(box,  model3, glm::vec3(0.2f,0.4f,0.8f));
     glDisable(GL_POLYGON_OFFSET_FILL);
 
     // 線（黒）
+    #ifndef __EMSCRIPTEN__
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glLineWidth(2.0f);
     renderer.draw(cube, model1, glm::vec3(0.0f,0.0f,0.0f));
     renderer.draw(cyl, model2, glm::vec3(0.0f,0.0f,0.0f));
     renderer.draw(box, model3, glm::vec3(0.0f,0.0f,0.0f));
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    #endif
 
     // ImGUI描画（必ず最後）
     glDisable(GL_DEPTH_TEST);
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     glEnable(GL_DEPTH_TEST);
-
-        glfwSwapBuffers(window);
-    }
+    
+    glfwSwapBuffers(window);
 }
 
 void App::shutdown()

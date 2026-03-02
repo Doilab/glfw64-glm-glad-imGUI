@@ -25,6 +25,8 @@ private:
     bool init();
     void mainLoop();
     void shutdown();
+    friend void loopProxy(void*);//Web用
+  
 
     // --- コールバック関連 ---
     static void mouseCallback(GLFWwindow* window, double xpos, double ypos);
