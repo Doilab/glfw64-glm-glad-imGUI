@@ -3,6 +3,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 
+#ifndef __EMSCRIPTEN__
 static const char* vertexShaderSource = R"(#version 330 core
 layout (location = 0) in vec3 aPos;
 
@@ -12,7 +13,6 @@ void main()
 {
     gl_Position = MVP * vec4(aPos, 1.0);
 })";
-
 static const char* fragmentShaderSource = R"(#version 330 core
 uniform vec3 color;
 
@@ -22,14 +22,49 @@ void main()
 {
     FragColor = vec4(color, 1.0);
 })";
+#else
+static const char* vertexShaderSource = R"(#version 300 es
+precision mediump float;
+
+layout (location = 0) in vec3 aPos;
+
+uniform mat4 MVP;
+
+void main()
+{
+    gl_Position = MVP * vec4(aPos, 1.0);
+})";
+static const char* fragmentShaderSource = R"(#version 300 es
+precision mediump float;
+
+uniform vec3 color;
+
+out vec4 FragColor;
+
+void main()
+{
+    FragColor = vec4(color, 1.0);
+})";
+#endif
+
 
 unsigned int Renderer::createShader(
     const char* vs,
     const char* fs)
 {
+
     unsigned int vertex = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertex, 1, &vs, NULL);
     glCompileShader(vertex);
+
+    int success;
+    char infoLog[512];
+
+    glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        glGetShaderInfoLog(vertex, 512, NULL, infoLog);
+        std::cout << "Vertex Shader Error:\n" << infoLog << std::endl;
+    }
 
     unsigned int fragment = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragment, 1, &fs, NULL);

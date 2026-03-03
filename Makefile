@@ -25,13 +25,14 @@ linux:
 	-o app.exe
 
 linux-web:
-	emcc  $(APP_SRC_WEB) $(IMGUI_SRC) -I. -I./include -I./imGUI  -I./glm \
+	em++  $(APP_SRC_WEB) $(IMGUI_SRC) -I. -I./include -I./imGUI  -I./glm \
 	-s USE_GLFW=3 \
     -s USE_WEBGL2=1 \
     -s FULL_ES3=1 \
     -s WASM=1 \
 	--preload-file ./ipag.ttf \
 	-s ALLOW_MEMORY_GROWTH=1 \
+	-sMAX_WEBGL_VERSION=2 -sMIN_WEBGL_VERSION=2\
     -o html/index.html
 
 clean:
