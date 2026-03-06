@@ -18,13 +18,19 @@ public:
 
     struct Mesh
     {
-        unsigned int VAO = 0;
-        unsigned int VBO = 0;
-        int vertexCount = 0;
+        GLuint VAO;
+        GLuint VBO;
+        GLuint EBO;        // 三角形インデックス
 
+        GLuint edgeEBO;    // エッジ用インデックス
+
+        int indexCount;
+        int edgeIndexCount;
         void cleanup()
         {
             if (VBO) glDeleteBuffers(1, &VBO);
+            if (EBO) glDeleteBuffers(1, &EBO);
+            if (edgeEBO) glDeleteBuffers(1, &edgeEBO);
             if (VAO) glDeleteVertexArrays(1, &VAO);
         }
     };
@@ -40,7 +46,10 @@ private:
     unsigned int createShader(const char* vs,
                               const char* fs);
 
-    Mesh createMesh(const std::vector<float>& vertices);
+    Mesh createMesh(
+    const std::vector<float>& vertices,
+    const std::vector<unsigned int>& indices,
+    const std::vector<unsigned int>& edgeIndices);
 
 public:
     bool init(int width, int height);
@@ -50,13 +59,22 @@ public:
     void draw(const Mesh& mesh,
               const glm::mat4& model,
               const glm::vec3& color);
+    void drawEdges(
+    const Mesh& mesh,
+    const glm::mat4& model,
+    const glm::vec3& color);
+
+    void drawTriangles(
+    const Mesh& mesh,
+    const glm::mat4& model,
+    const glm::vec3& color);
 
     // 形状生成
     Mesh createCube(float size);
-    Mesh createBox(float sx, float sy, float sz);
-    Mesh createCylinder(float radius,
-                        float height,
-                        int segments);
+    //Mesh createBox(float sx, float sy, float sz);
+    //Mesh createCylinder(float radius,
+    //                    float height,
+    //                    int segments);
 
     
 };

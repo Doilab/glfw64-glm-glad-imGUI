@@ -108,63 +108,124 @@ bool Renderer::init(int width, int height)
 //----------------------------
 Renderer::Mesh
 Renderer::createMesh(
-    const std::vector<float>& vertices)
+    const std::vector<float>& vertices,
+    const std::vector<unsigned int>& indices,
+    const std::vector<unsigned int>& edgeIndices)
 {
     Mesh mesh;
 
     glGenVertexArrays(1, &mesh.VAO);
     glGenBuffers(1, &mesh.VBO);
 
-    glBindVertexArray(mesh.VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
+    glGenBuffers(1, &mesh.EBO);
+    glGenBuffers(1, &mesh.edgeEBO);
 
+    glBindVertexArray(mesh.VAO);
+
+
+    // VBO
+    glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
     glBufferData(GL_ARRAY_BUFFER,
-                 vertices.size() * sizeof(float),
+                 vertices.size()*sizeof(float),
                  vertices.data(),
                  GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT,
-                          GL_FALSE,
-                          3*sizeof(float),
-                          (void*)0);
+    // EBO (triangle)
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                 indices.size()*sizeof(unsigned int),
+                 indices.data(),
+                 GL_STATIC_DRAW);
+
+    glVertexAttribPointer(
+        0, 3, GL_FLOAT, GL_FALSE,
+        3*sizeof(float), (void*)0);
 
     glEnableVertexAttribArray(0);
 
-    mesh.vertexCount = vertices.size() / 3;
+    // edge EBO
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.edgeEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                 edgeIndices.size()*sizeof(unsigned int),
+                 edgeIndices.data(),
+                 GL_STATIC_DRAW);
+
+    mesh.indexCount = indices.size();
+    mesh.edgeIndexCount = edgeIndices.size();
+
 
     return mesh;
 }
 
-Renderer::Mesh
-Renderer::createCube(float size)
+Renderer::Mesh Renderer::createCube(float size)
 {
     float s = size * 0.5f;
 
-    std::vector<float> v = {
-        // front
-        -s,-s, s,  s,-s, s,  s, s, s,
-         s, s, s, -s, s, s, -s,-s, s,
-        // back
-        -s,-s,-s, -s, s,-s,  s, s,-s,
-         s, s,-s,  s,-s,-s, -s,-s,-s,
-        // left
-        -s, s, s, -s, s,-s, -s,-s,-s,
-        -s,-s,-s, -s,-s, s, -s, s, s,
-        // right
-         s, s, s,  s,-s,-s,  s, s,-s,
-         s,-s,-s,  s, s, s,  s,-s, s,
-        // top
-        -s, s,-s, -s, s, s,  s, s, s,
-         s, s, s,  s, s,-s, -s, s,-s,
-        // bottom
-        -s,-s,-s,  s,-s,-s,  s,-s, s,
-         s,-s, s, -s,-s, s, -s,-s,-s
+    std::vector<float> vertices =
+    {
+        -s,-s,-s,
+         s,-s,-s,
+         s, s,-s,
+        -s, s,-s,
+        -s,-s, s,
+         s,-s, s,
+         s, s, s,
+        -s, s, s
     };
 
-    return createMesh(v);
+    std::vector<unsigned int> indices =
+    {
+        0,1,2, 2,3,0,
+        4,5,6, 6,7,4,
+        0,4,7, 7,3,0,
+        1,5,6, 6,2,1,
+        3,2,6, 6,7,3,
+        0,1,5, 5,4,0
+    };
+
+    std::vector<unsigned int> edges =
+    {
+        0,1, 1,2, 2,3, 3,0,
+        4,5, 5,6, 6,7, 7,4,
+        0,4, 1,5, 2,6, 3,7
+    };
+
+    Mesh mesh{};
+
+    glGenVertexArrays(1,&mesh.VAO);
+    glBindVertexArray(mesh.VAO);
+
+    glGenBuffers(1,&mesh.VBO);
+    glBindBuffer(GL_ARRAY_BUFFER,mesh.VBO);
+    glBufferData(GL_ARRAY_BUFFER,
+                 vertices.size()*sizeof(float),
+                 vertices.data(),
+                 GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,3*sizeof(float),(void*)0);
+    glEnableVertexAttribArray(0);
+
+    glGenBuffers(1,&mesh.EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,mesh.EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                 indices.size()*sizeof(unsigned int),
+                 indices.data(),
+                 GL_STATIC_DRAW);
+
+    glGenBuffers(1,&mesh.edgeEBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,mesh.edgeEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                 edges.size()*sizeof(unsigned int),
+                 edges.data(),
+                 GL_STATIC_DRAW);
+
+    mesh.indexCount = indices.size();
+    mesh.edgeIndexCount = edges.size();
+
+    return mesh;
 }
 
-Renderer::Mesh
+/* Renderer::Mesh
 Renderer::createBox(float sx,
                           float sy,
                           float sz)
@@ -237,9 +298,58 @@ Renderer::createCylinder(float r,
     }
 
     return createMesh(v);
+} */
+
+//------------------
+void Renderer::drawTriangles(
+    const Mesh& mesh,
+    const glm::mat4& model,
+    const glm::vec3& color)
+{
+    glUseProgram(shaderProgram);
+
+    glm::mat4 MVP = projection * view * model;
+
+    glUniformMatrix4fv(
+        mvpLoc,1,GL_FALSE,
+        glm::value_ptr(MVP));
+
+    glUniform3fv(colorLoc,1,&color[0]);
+
+    glBindVertexArray(mesh.VAO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.EBO);
+
+    glDrawElements(
+        GL_TRIANGLES,
+        mesh.indexCount,
+        GL_UNSIGNED_INT,
+        0);
 }
+//-----
+void Renderer::drawEdges(
+    const Mesh& mesh,
+    const glm::mat4& model,
+    const glm::vec3& color)
+{
+    glUseProgram(shaderProgram);
 
+    glm::mat4 MVP = projection * view * model;
 
+    glUniformMatrix4fv(
+        mvpLoc,1,GL_FALSE,
+        glm::value_ptr(MVP));
+
+    glUniform3fv(colorLoc,1,&color[0]);
+
+    glBindVertexArray(mesh.VAO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.edgeEBO);
+
+    glDrawElements(
+        GL_LINES,
+        mesh.edgeIndexCount,
+        GL_UNSIGNED_INT,
+        0);
+}
 
 void Renderer::draw(
     const Mesh& mesh,
@@ -268,10 +378,25 @@ void Renderer::draw(
     glBindVertexArray(mesh.VAO);
 
     // 描画
-    glDrawArrays(
+    /* glDrawArrays(
         GL_TRIANGLES,
         0,
-        mesh.vertexCount);
+        mesh.vertexCount); */
+    //面
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.EBO);
+    glDrawElements(
+        GL_TRIANGLES,
+        mesh.indexCount,
+        GL_UNSIGNED_INT,
+        0);
+
+    //エッジ
+/*     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.edgeEBO);
+    glDrawElements(
+        GL_LINES,
+        mesh.edgeIndexCount,
+        GL_UNSIGNED_INT,
+        0); */
 }
 
 

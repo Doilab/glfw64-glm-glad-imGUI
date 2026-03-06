@@ -125,8 +125,8 @@ bool App::init()
 
     //ここで形状生成
     cube = renderer.createCube(0.5f);
-    cyl  = renderer.createCylinder(0.2f,0.8f,16);
-    box  = renderer.createBox(0.5f,1.0f,0.2f);
+    //cyl  = renderer.createCylinder(0.2f,0.8f,16);
+    //box  = renderer.createBox(0.5f,1.0f,0.2f);
 
     //imGUIの設定
     setup_imgui(window);
@@ -201,17 +201,22 @@ void App::mainLoop()
     glPolygonOffset(1.0f,1.0f);
     #endif
     renderer.draw(cube, model1, glm::vec3(0.8f,0.2f,0.2f));
-    renderer.draw(cyl,  model2, glm::vec3(0.2f,0.8f,0.2f));
-    renderer.draw(box,  model3, glm::vec3(0.2f,0.4f,0.8f));
+    //renderer.draw(cube, model1, glm::vec3(1.0f,1.0f,0.2f));
+    renderer.drawEdges(cube, model1, glm::vec3(0.0f,0.0f,0.0f));
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cube.edgeEBO);
+    //glDrawElements(GL_LINES, cube.edgeIndexCount, GL_UNSIGNED_INT, 0);
+
+    //renderer.draw(cyl,  model2, glm::vec3(0.2f,0.8f,0.2f));
+    //renderer.draw(box,  model3, glm::vec3(0.2f,0.4f,0.8f));
     glDisable(GL_POLYGON_OFFSET_FILL);
 
     // 線（黒）
     #ifndef __EMSCRIPTEN__
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glLineWidth(2.0f);
-    renderer.draw(cube, model1, glm::vec3(0.0f,0.0f,0.0f));
-    renderer.draw(cyl, model2, glm::vec3(0.0f,0.0f,0.0f));
-    renderer.draw(box, model3, glm::vec3(0.0f,0.0f,0.0f));
+    //srenderer.draw(cube, model1, glm::vec3(0.0f,0.0f,0.0f));
+    //renderer.draw(cyl, model2, glm::vec3(0.0f,0.0f,0.0f));
+    //renderer.draw(box, model3, glm::vec3(0.0f,0.0f,0.0f));
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     #endif
 

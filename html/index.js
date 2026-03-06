@@ -71,7 +71,7 @@ var ENVIRONMENT_IS_SHELL = !ENVIRONMENT_IS_WEB && !ENVIRONMENT_IS_NODE && !ENVIR
 
 // --pre-jses are emitted after the Module integration code, so that they can
 // refer to Module (if they choose; they can also define Module)
-// include: /tmp/tmp7znugnl_.js
+// include: /tmp/tmpmk5d5qwz.js
 
   if (!Module['expectedDataFileDownloads']) Module['expectedDataFileDownloads'] = 0;
   Module['expectedDataFileDownloads']++;
@@ -203,21 +203,21 @@ var ENVIRONMENT_IS_SHELL = !ENVIRONMENT_IS_WEB && !ENVIRONMENT_IS_NODE && !ENVIR
 
   })();
 
-// end include: /tmp/tmp7znugnl_.js
-// include: /tmp/tmp5z5myrf3.js
+// end include: /tmp/tmpmk5d5qwz.js
+// include: /tmp/tmppqtu907u.js
 
     // All the pre-js content up to here must remain later on, we need to run
     // it.
     if ((typeof ENVIRONMENT_IS_WASM_WORKER != 'undefined' && ENVIRONMENT_IS_WASM_WORKER) || (typeof ENVIRONMENT_IS_PTHREAD != 'undefined' && ENVIRONMENT_IS_PTHREAD) || (typeof ENVIRONMENT_IS_AUDIO_WORKLET != 'undefined' && ENVIRONMENT_IS_AUDIO_WORKLET)) Module['preRun'] = [];
     var necessaryPreJSTasks = Module['preRun'].slice();
-  // end include: /tmp/tmp5z5myrf3.js
-// include: /tmp/tmpfukqfm1m.js
+  // end include: /tmp/tmppqtu907u.js
+// include: /tmp/tmpcl24wv8f.js
 
     if (!Module['preRun']) throw 'Module.preRun should exist because file support used it; did a pre-js delete it?';
     necessaryPreJSTasks.forEach((task) => {
       if (Module['preRun'].indexOf(task) < 0) throw 'All preRun tasks that exist before user pre-js code should remain after; did you replace Module or modify Module.preRun?';
     });
-  // end include: /tmp/tmpfukqfm1m.js
+  // end include: /tmp/tmpcl24wv8f.js
 
 
 var arguments_ = [];
@@ -5208,16 +5208,6 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
   var _emscripten_glDisable = (x0) => GLctx.disable(x0);
   var _glDisable = _emscripten_glDisable;
 
-  var _emscripten_glDrawArrays = (mode, first, count) => {
-      // bind any client-side buffers
-      GL.preDrawHandleClientVertexAttribBindings(first + count);
-  
-      GLctx.drawArrays(mode, first, count);
-  
-      GL.postDrawHandleClientVertexAttribBindings();
-    };
-  var _glDrawArrays = _emscripten_glDrawArrays;
-
   var _emscripten_glDrawElements = (mode, count, type, indices) => {
       var buf;
       var vertexes = 0;
@@ -8354,8 +8344,6 @@ var wasmImports = {
   glDetachShader: _glDetachShader,
   /** @export */
   glDisable: _glDisable,
-  /** @export */
-  glDrawArrays: _glDrawArrays,
   /** @export */
   glDrawElements: _glDrawElements,
   /** @export */
