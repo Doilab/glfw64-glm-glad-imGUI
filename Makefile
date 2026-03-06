@@ -32,7 +32,8 @@ linux-web:
     -s WASM=1 \
 	--preload-file ./ipag.ttf \
 	-s ALLOW_MEMORY_GROWTH=1 \
-	-sMAX_WEBGL_VERSION=2 -sMIN_WEBGL_VERSION=2\
+	-sMAX_WEBGL_VERSION=2 -sMIN_WEBGL_VERSION=2 \
+	-fexceptions \
     -o html/index.html
 
 clean:
