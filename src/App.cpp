@@ -65,7 +65,8 @@ void setup_imgui(GLFWwindow* window)
     ImGuiIO& io = ImGui::GetIO(); (void)io;
 
     //io.Fonts->AddFontFromFileTTF("ipag.ttf",32.0f,NULL,io.Fonts->GetGlyphRangesDefault());
-    io.Fonts->AddFontFromFileTTF("ipag.ttf",32.0f,NULL,io.Fonts->GetGlyphRangesJapanese());
+    //io.Fonts->AddFontFromFileTTF("ipag.ttf",32.0f,NULL,io.Fonts->GetGlyphRangesJapanese());
+    io.Fonts->AddFontFromFileTTF("/ipag.ttf",32.0f,NULL,io.Fonts->GetGlyphRangesJapanese());//em++用
     //io.FontGlobalScale = 5;//スケール大きく
 
     // Setup Dear ImGui style

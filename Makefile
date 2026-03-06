@@ -37,9 +37,9 @@ linux-web:
 	-s INITIAL_MEMORY=134217728 \
 	-s ALLOW_MEMORY_GROWTH=1 \
 	-fexceptions \
+	--preload-file ./ipag.ttf \
 	-O2 \
 	-o docs/index.html
-#	--preload-file ./ipag.ttf \
 
 clean:
 	rm *.o *.exe
