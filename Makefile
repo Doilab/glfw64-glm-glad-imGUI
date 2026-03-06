@@ -34,10 +34,12 @@ linux-web:
 	-s FULL_ES3=1 \
 	-s ALLOW_MEMORY_GROWTH=1 \
 	-s ASSERTIONS=1 \
+	-s INITIAL_MEMORY=134217728
+	-s ALLOW_MEMORY_GROWTH=1
 	--preload-file ./ipag.ttf \
 	-fexceptions \
 	-O2 \
 	-o html/index.html
-	
+
 clean:
 	rm *.o *.exe
