@@ -38,7 +38,7 @@ linux-web:
 	-s ALLOW_MEMORY_GROWTH=1 \
 	-fexceptions \
 	-O2 \
-	-o html/index.html
+	-o docs/index.html
 #	--preload-file ./ipag.ttf \
 
 clean:
