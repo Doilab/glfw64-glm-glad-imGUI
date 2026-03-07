@@ -231,12 +231,12 @@ void App::mainLoop()
     #endif
 
     // ImGUI描画（必ず最後）
-    //#ifndef __EMSCRIPTEN__
+    #ifndef __EMSCRIPTEN__
     glDisable(GL_DEPTH_TEST);
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     glEnable(GL_DEPTH_TEST);
-    //#endif
+    #endif
     
     glfwSwapBuffers(window);
 }
