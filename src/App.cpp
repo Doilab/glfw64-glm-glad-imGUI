@@ -134,8 +134,9 @@ bool App::init()
     //box  = renderer.createBox(0.5f,1.0f,0.2f);
 
     //imGUIの設定
+    #ifndef __EMSCRIPTEN__
     setup_imgui(window);
-
+    #endif
 
     return true;
 }
@@ -144,6 +145,7 @@ void App::mainLoop()
 {
     glfwPollEvents();
 
+    #ifndef __EMSCRIPTEN__
     // ImGUIフレーム開始
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -155,6 +157,7 @@ void App::mainLoop()
     ImGui::DragFloat("x", &imgui_x);
     ImGui::DragFloat("y", &imgui_y);
     ImGui::End();
+    #endif
 
     // 画面クリア
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -226,10 +229,12 @@ void App::mainLoop()
     #endif
 
     // ImGUI描画（必ず最後）
+    #ifndef __EMSCRIPTEN__
     glDisable(GL_DEPTH_TEST);
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     glEnable(GL_DEPTH_TEST);
+    #endif
     
     glfwSwapBuffers(window);
 }
