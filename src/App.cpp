@@ -62,7 +62,12 @@ void setup_imgui(GLFWwindow* window)
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    int w, h;
+    glfwGetFramebufferSize(window, &w, &h);
+
+    ImGuiIO& io = ImGui::GetIO();
+    io.DisplaySize = ImVec2((float)w, (float)h);
+    io.DisplayFramebufferScale = ImVec2(1.0f,1.0f);
 
     #ifndef __EMSCRIPTEN__
         //io.Fonts->AddFontFromFileTTF("ipag.ttf",32.0f,NULL,io.Fonts->GetGlyphRangesDefault());
@@ -70,7 +75,9 @@ void setup_imgui(GLFWwindow* window)
         //io.FontGlobalScale = 5;//スケール大きく
     #else
         //io.Fonts->AddFontFromFileTTF("/ipag.ttf",32.0f,NULL,io.Fonts->GetGlyphRangesJapanese());//em++用
-        ;
+        // Webはフォントロード失敗しやすいので
+        // デフォルトフォントを使う
+        io.Fonts->AddFontDefault();
     #endif
 
     // Setup Dear ImGui style
@@ -122,7 +129,7 @@ bool App::init()
     // ここでレンダリング初期化（GLコンテキスト後！）
     if (!renderer.init(800,600))
         return false;
-    glEnable(GL_DEPTH_TEST);  // ← ここに追加
+    glEnable(GL_DEPTH_TEST);
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);
     glViewport(0, 0, width, height);
@@ -145,20 +152,39 @@ void App::mainLoop()
 {
     glfwPollEvents();
 
+    //ImGUI入力
+        int w,h;
+    glfwGetFramebufferSize(window,&w,&h);
+
+    ImGuiIO& io = ImGui::GetIO();
+    io.DisplaySize = ImVec2(w,h);
+    io.DeltaTime = 1.0f/60.0f;
+
+    double mx,my;
+    glfwGetCursorPos(window,&mx,&my);
+
+    io.MousePos = ImVec2(mx,my);
+    io.MouseDown[0] = glfwGetMouseButton(window,GLFW_MOUSE_BUTTON_LEFT)==GLFW_PRESS;
+
+
     // ImGUIフレーム開始
     ImGui_ImplOpenGL3_NewFrame();
 
     #ifndef __EMSCRIPTEN__
-    //ImGui_ImplGlfw_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
     #endif
+
+
     ImGui::NewFrame();
 
-    // ImGUI描画準備
+    //#ifndef __EMSCRIPTEN__
+    // ImGUI描画内容セット
     ImGui::Begin(u8"Hello, world!日本語2");
     ImGui::Text("This is some useful text. %d", 123);
     ImGui::DragFloat("x", &imgui_x);
     ImGui::DragFloat("y", &imgui_y);
     ImGui::End();
+    //#endif
 
 
     // 画面クリア
@@ -231,12 +257,12 @@ void App::mainLoop()
     #endif
 
     // ImGUI描画（必ず最後）
-    #ifndef __EMSCRIPTEN__
+    //#ifndef __EMSCRIPTEN__
     glDisable(GL_DEPTH_TEST);
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     glEnable(GL_DEPTH_TEST);
-    #endif
+    //#endif
     
     glfwSwapBuffers(window);
 }

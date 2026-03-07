@@ -1,6 +1,7 @@
 OpenGLの表示のサンプル．glfwを使用．クロスプラットフォーム．
 Windoows Mingw/ WSL2/ Ubuntu Linux
 ------------------
+本ファイルはobsolete
 
 ------------------
 260301
