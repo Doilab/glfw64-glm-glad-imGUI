@@ -57,7 +57,7 @@ int App::run()
     return 0;
 }
 
-void setup_imgui(GLFWwindow* window)
+void imgui_setup(GLFWwindow* window)
 {
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
@@ -94,7 +94,47 @@ void setup_imgui(GLFWwindow* window)
         ImGui_ImplOpenGL3_Init(glsl_version);//PC用
     #endif
 }
+//----------------------
+void imgui_begin(GLFWwindow* window)
+{
+    int w,h;
+    glfwGetFramebufferSize(window,&w,&h);
 
+    ImGuiIO& io = ImGui::GetIO();
+
+    io.DisplaySize = ImVec2((float)w,(float)h);
+    io.DeltaTime = 1.0f/60.0f;
+
+    double mx,my;
+    glfwGetCursorPos(window,&mx,&my);
+
+    io.MousePos = ImVec2((float)mx,(float)my);
+
+    io.MouseDown[0] =
+        glfwGetMouseButton(window,GLFW_MOUSE_BUTTON_LEFT)==GLFW_PRESS;
+
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui::NewFrame();
+}
+
+//----------------------
+void imgui_draw()
+{
+    // ImGUI描画内容セット
+    ImGui::Begin(u8"Hello, world!日本語3");
+    ImGui::Text("This is some useful text. %d", 123);
+    ImGui::DragFloat("x", &imgui_x);
+    ImGui::DragFloat("y", &imgui_y);
+    ImGui::End();
+ 
+}
+//----------------------
+void imgui_end()
+{
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+//----------------------
 bool App::init()
 {
     if (!glfwInit())
@@ -140,11 +180,9 @@ bool App::init()
     //cyl  = renderer.createCylinder(0.2f,0.8f,16);
     //box  = renderer.createBox(0.5f,1.0f,0.2f);
 
-    //imGUIの設定
-    //#ifndef __EMSCRIPTEN__
-    setup_imgui(window);
-    //#endif
-
+    //imGUIの初期設定
+    imgui_setup(window);
+    
     return true;
 }
 
@@ -152,40 +190,11 @@ void App::mainLoop()
 {
     glfwPollEvents();
 
-    //ImGUI入力
-        int w,h;
-    glfwGetFramebufferSize(window,&w,&h);
-
-    ImGuiIO& io = ImGui::GetIO();
-    io.DisplaySize = ImVec2(w,h);
-    io.DeltaTime = 1.0f/60.0f;
-
-    double mx,my;
-    glfwGetCursorPos(window,&mx,&my);
-
-    io.MousePos = ImVec2(mx,my);
-    io.MouseDown[0] = glfwGetMouseButton(window,GLFW_MOUSE_BUTTON_LEFT)==GLFW_PRESS;
-
-
-    // ImGUIフレーム開始
-    ImGui_ImplOpenGL3_NewFrame();
-
-    #ifndef __EMSCRIPTEN__
-        ImGui_ImplGlfw_NewFrame();
-    #endif
-
-
-    ImGui::NewFrame();
-
-    //#ifndef __EMSCRIPTEN__
-    // ImGUI描画内容セット
-    ImGui::Begin(u8"Hello, world!日本語2");
-    ImGui::Text("This is some useful text. %d", 123);
-    ImGui::DragFloat("x", &imgui_x);
-    ImGui::DragFloat("y", &imgui_y);
-    ImGui::End();
-    //#endif
-
+    //ImGUI初期化と入力読み取り
+    imgui_begin(window);
+    //ImGUIの描画準備
+    imgui_draw();
+ 
 
     // 画面クリア
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -257,12 +266,9 @@ void App::mainLoop()
     #endif
 
     // ImGUI描画（必ず最後）
-    //#ifndef __EMSCRIPTEN__
     glDisable(GL_DEPTH_TEST);
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        imgui_end();
     glEnable(GL_DEPTH_TEST);
-    //#endif
     
     glfwSwapBuffers(window);
 }
@@ -270,8 +276,8 @@ void App::mainLoop()
 void App::shutdown()
 {
     cube.cleanup();
-    cyl.cleanup();
-    box.cleanup(); 
+    //cyl.cleanup();
+    //box.cleanup(); 
 
     ImGui_ImplOpenGL3_Shutdown();
     #ifdef __EMSCRIPTEN__
