@@ -150,7 +150,7 @@ void App::mainLoop()
     ImGui::NewFrame();
 
     // ImGUI描画準備
-    ImGui::Begin(u8"Hello, world!日本語");
+    ImGui::Begin(u8"Hello, world!日本語2");
     ImGui::Text("This is some useful text. %d", 123);
     ImGui::DragFloat("x", &imgui_x);
     ImGui::DragFloat("y", &imgui_y);
