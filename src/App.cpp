@@ -79,11 +79,11 @@ void setup_imgui(GLFWwindow* window)
 
     // Setup Platform/Renderer bindings
     //ImGui_ImplGlfwGL3_Init(window, true);
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    const char* glsl_version = "#version 130";
     #ifdef __EMSCRIPTEN__
         ImGui_ImplOpenGL3_Init("#version 300 es");//for emcc web用
     #else
+        ImGui_ImplGlfw_InitForOpenGL(window, true);
+        const char* glsl_version = "#version 130";
         ImGui_ImplOpenGL3_Init(glsl_version);//PC用
     #endif
 }
@@ -134,9 +134,9 @@ bool App::init()
     //box  = renderer.createBox(0.5f,1.0f,0.2f);
 
     //imGUIの設定
-    #ifndef __EMSCRIPTEN__
+    //#ifndef __EMSCRIPTEN__
     setup_imgui(window);
-    #endif
+    //#endif
 
     return true;
 }
@@ -145,10 +145,12 @@ void App::mainLoop()
 {
     glfwPollEvents();
 
-    #ifndef __EMSCRIPTEN__
     // ImGUIフレーム開始
     ImGui_ImplOpenGL3_NewFrame();
+
+    #ifndef __EMSCRIPTEN__
     ImGui_ImplGlfw_NewFrame();
+    #endif
     ImGui::NewFrame();
 
     // ImGUI描画準備
@@ -157,7 +159,7 @@ void App::mainLoop()
     ImGui::DragFloat("x", &imgui_x);
     ImGui::DragFloat("y", &imgui_y);
     ImGui::End();
-    #endif
+
 
     // 画面クリア
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -246,7 +248,9 @@ void App::shutdown()
     box.cleanup(); 
 
     ImGui_ImplOpenGL3_Shutdown();
+    #ifdef __EMSCRIPTEN__
     ImGui_ImplGlfw_Shutdown();
+    #endif
     ImGui::DestroyContext();
 
     if (window)

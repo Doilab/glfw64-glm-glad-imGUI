@@ -5,6 +5,8 @@ APP_SRC = ./src/App.cpp ./src/Renderer.cpp ./src/main.cpp ./src/Camera.cpp ./gla
 APP_SRC_WEB = ./src/App.cpp ./src/Renderer.cpp ./src/main.cpp ./src/Camera.cpp
 IMGUI_SRC = imGUI/imgui/imgui.cpp imGUI/imgui/imgui_draw.cpp imGUI/imgui/imgui_widgets.cpp imGUI/imgui/imgui_tables.cpp \
     imGUI/imgui/backends/imgui_impl_glfw.cpp imGUI/imgui/backends/imgui_impl_opengl3.cpp 
+IMGUI_SRC_WEB = imGUI/imgui/imgui.cpp imGUI/imgui/imgui_draw.cpp imGUI/imgui/imgui_widgets.cpp imGUI/imgui/imgui_tables.cpp \
+     imGUI/imgui/backends/imgui_impl_opengl3.cpp 
 WINOPT = -lglu32 -lopengl32 -static -lstdc++ -lgcc
 
 all:win64
@@ -25,7 +27,7 @@ linux:
 	-o app.exe
 
 linux-web:
-	em++ $(APP_SRC_WEB) $(IMGUI_SRC) \
+	em++ $(APP_SRC_WEB) $(IMGUI_SRC_WEB) \
 	-I. -I./include -I./imGUI -I./glm \
 	-s USE_GLFW=3 \
 	-s USE_WEBGL2=1 \
@@ -36,9 +38,9 @@ linux-web:
 	-s INITIAL_MEMORY=134217728 \
 	-s ALLOW_MEMORY_GROWTH=1 \
 	-fexceptions \
-	--preload-file ipag.ttf \
 	-O2 \
 	-o docs/index.html
+#	--preload-file ipag.ttf \
 
 clean:
 	rm *.o *.exe
