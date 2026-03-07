@@ -149,7 +149,7 @@ void App::mainLoop()
     ImGui_ImplOpenGL3_NewFrame();
 
     #ifndef __EMSCRIPTEN__
-    ImGui_ImplGlfw_NewFrame();
+    //ImGui_ImplGlfw_NewFrame();
     #endif
     ImGui::NewFrame();
 
