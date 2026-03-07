@@ -69,7 +69,8 @@ void setup_imgui(GLFWwindow* window)
         io.Fonts->AddFontFromFileTTF("ipag.ttf",32.0f,NULL,io.Fonts->GetGlyphRangesJapanese());
         //io.FontGlobalScale = 5;//スケール大きく
     #else
-        io.Fonts->AddFontFromFileTTF("/ipag.ttf",32.0f,NULL,io.Fonts->GetGlyphRangesJapanese());//em++用
+        //io.Fonts->AddFontFromFileTTF("/ipag.ttf",32.0f,NULL,io.Fonts->GetGlyphRangesJapanese());//em++用
+        ;
     #endif
 
     // Setup Dear ImGui style
