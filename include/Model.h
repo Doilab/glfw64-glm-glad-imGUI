@@ -8,7 +8,6 @@ class Model
 public:
     std::vector<float> vertices;
     std::vector<unsigned int> indices;
-    //std::vector<unsigned int> edges;
     std::vector<unsigned int> edgeIndices;
 
     GLuint VAO_faces = 0;

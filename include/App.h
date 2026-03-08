@@ -14,10 +14,8 @@ public:
 
 private:
     Renderer renderer;
-    Model cube, axis;
-    // Renderer::Mesh cube;
-    // Renderer::Mesh cyl;
-    // Renderer::Mesh box;
+    Model cube, cyl;
+    Model axis3, xAxis, yAxis, zAxis;
 
     Camera camera;
 

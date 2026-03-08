@@ -173,8 +173,12 @@ bool App::init()
 
 
     //ここで形状生成
-    axis = ModelBuilder::createAxis(2);
+    axis3 = ModelBuilder::create3Axis(2);
+    xAxis = ModelBuilder::createXAxis(2);
+    yAxis = ModelBuilder::createYAxis(2);
+    zAxis = ModelBuilder::createZAxis(2);
     cube = ModelBuilder::createCube(1);
+    cyl = ModelBuilder::createCylinder(0.5f,1.0f,16);
     
     //imGUIの初期設定
     imgui_setup(window);
@@ -245,18 +249,23 @@ void App::mainLoop()
     glPolygonOffset(1.0, 1.0);
 
     renderer.draw(cube, model1, glm::vec3(0.8,0.0,0.0), GL_TRIANGLES);
+    renderer.draw(cyl, model2, glm::vec3(0.0,0.8,0.0), GL_TRIANGLES);
 
     glDisable(GL_POLYGON_OFFSET_FILL);
 
     // エッジ
     //glDisable(GL_DEPTH_TEST);
     glLineWidth(2.0f);
-    renderer.drawEdges(cube,model1,glm::vec3(0.0,0.0,0.8));
+    renderer.drawEdges(cube,model1,glm::vec3(0.0,0.0,0.0));
+    renderer.drawEdges(cyl,model2,glm::vec3(0.0,0.0,0.0));
     //glEnable(GL_DEPTH_TEST);
 
     // Axis
     glLineWidth(3.0f);
-    renderer.draw(axis, model1, glm::vec3(0,1,0), GL_LINES);
+//    renderer.draw(axis, model1, glm::vec3(0,1,0), GL_LINES);
+    renderer.draw(xAxis, model1, glm::vec3(1,0,0), GL_LINES);
+    renderer.draw(yAxis, model1, glm::vec3(0,1,0), GL_LINES);
+    renderer.draw(zAxis, model1, glm::vec3(0,0,1), GL_LINES);
     
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);//ワイヤーフレームでデバッグ
     //renderer.draw(cube, model1, glm::vec3(0,0,0));
