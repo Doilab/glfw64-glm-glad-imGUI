@@ -1,4 +1,4 @@
-/build/
+build/
 *.o
 *.exe
 *.dll
@@ -7,3 +7,6 @@
 *.log
 # Windows が作る zone.identifier ファイルを無視
 *Zone.Identifier
+*.dylib
+.vscode/
+.idea/
