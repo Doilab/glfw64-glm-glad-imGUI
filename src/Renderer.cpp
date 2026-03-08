@@ -123,6 +123,18 @@ void Renderer::draw(Model& model,
     model.draw(mode);
 }
 //----------------------------
+void Renderer::drawEdges(Model& model,
+        const glm::mat4& modelMat,
+        const glm::vec3& color)
+{
+    glUseProgram(shaderProgram);
+    glm::mat4 mvp = projection * view * modelMat;
+
+    glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, glm::value_ptr(mvp));
+    glUniform3fv(colorLoc, 1, glm::value_ptr(color));
+    model.drawEdges();
+}
+//----------------------------
 
 
 

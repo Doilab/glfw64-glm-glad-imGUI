@@ -1,4 +1,6 @@
 #include "ModelBuilder.h"
+#include <set>
+#include <utility>
 
 Model ModelBuilder::createCube(float s)
 {
@@ -29,6 +31,8 @@ Model ModelBuilder::createCube(float s)
         3,0,4, 3,4,7
     };
 
+    buildEdges(m);
+
     m.upload();
 
     return m;
@@ -51,4 +55,33 @@ Model ModelBuilder::createAxis(float size)
 
     m.upload();
     return m;
+}
+void ModelBuilder::buildEdges(Model& m)
+{
+    std::set<std::pair<int,int>> edges;
+
+    for(size_t i=0;i<m.indices.size();i+=3)
+    {
+        int a = m.indices[i];
+        int b = m.indices[i+1];
+        int c = m.indices[i+2];
+
+        auto addEdge=[&](int v1,int v2)
+        {
+            if(v1>v2) std::swap(v1,v2);
+            edges.insert({v1,v2});
+        };
+
+        addEdge(a,b);
+        addEdge(b,c);
+        addEdge(c,a);
+    }
+
+    for(auto&e:edges)
+    {
+        m.edgeIndices.push_back(e.first);
+        m.edgeIndices.push_back(e.second);
+    }
+
+
 }

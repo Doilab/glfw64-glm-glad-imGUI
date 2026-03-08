@@ -11,17 +11,11 @@
 
 #include "Renderer.h"
 #include "ModelBuilder.h"
-
+#include "GLHeaders.h"
 
 #ifdef __EMSCRIPTEN__
-    #include <GLES3/gl3.h>
     #include <emscripten.h>
-#else
-    #include <glad/glad.h>
 #endif
-
-// カメラ用
-//static float fov = 45.0f;
 
 // ImGUI用の変数初期化
 float imgui_x = 0.0f, imgui_y = 0.0f;
@@ -34,12 +28,13 @@ App::~App()
 {
 }
 
-
+//---------------------------------------------------
 void loopProxy(void* arg)
 {
     static_cast<App*>(arg)->mainLoop();
 }
 
+//---------------------------------------------------
 int App::run()
 {
     if (!init())
@@ -57,6 +52,7 @@ int App::run()
     return 0;
 }
 
+//---------------------------------------------------
 void imgui_setup(GLFWwindow* window)
 {
     // Setup Dear ImGui context
@@ -158,7 +154,7 @@ bool App::init()
     glfwMakeContextCurrent(window);
 
     #ifdef __EMSCRIPTEN__
-    // WebではGLAD不要
+        // WebではGLAD不要
     #else
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
         {
@@ -177,9 +173,9 @@ bool App::init()
 
 
     //ここで形状生成
-    cube = ModelBuilder::createCube();
-    axis = ModelBuilder::createAxis(3);
-
+    axis = ModelBuilder::createAxis(2);
+    cube = ModelBuilder::createCube(1);
+    
     //imGUIの初期設定
     imgui_setup(window);
     
@@ -244,6 +240,7 @@ void App::mainLoop()
 
     // 描画
     // 面
+    glEnable(GL_DEPTH_TEST);
     glEnable(GL_POLYGON_OFFSET_FILL);
     glPolygonOffset(1.0, 1.0);
 
@@ -252,12 +249,14 @@ void App::mainLoop()
     glDisable(GL_POLYGON_OFFSET_FILL);
 
     // エッジ
+    //glDisable(GL_DEPTH_TEST);
     glLineWidth(2.0f);
-    renderer.draw(cube, model1, glm::vec3(0,0,0), GL_LINES);
+    renderer.drawEdges(cube,model1,glm::vec3(0.0,0.0,0.8));
+    //glEnable(GL_DEPTH_TEST);
 
     // Axis
     glLineWidth(3.0f);
-    renderer.draw(axis, model1, glm::vec3(1,0,0), GL_LINES);
+    renderer.draw(axis, model1, glm::vec3(0,1,0), GL_LINES);
     
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);//ワイヤーフレームでデバッグ
     //renderer.draw(cube, model1, glm::vec3(0,0,0));

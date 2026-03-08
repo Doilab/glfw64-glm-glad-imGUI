@@ -12,4 +12,6 @@ public:
     static Model createCylinder(float radius, float height, int segments);
     static Model createSphere(float radius, int stacks, int slices);
 
+    static void buildEdges(Model& model);
+
 };
