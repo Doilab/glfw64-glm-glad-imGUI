@@ -74,10 +74,10 @@ void imgui_setup(GLFWwindow* window)
         io.Fonts->AddFontFromFileTTF("ipag.ttf",32.0f,NULL,io.Fonts->GetGlyphRangesJapanese());
         //io.FontGlobalScale = 5;//スケール大きく
     #else
-        //io.Fonts->AddFontFromFileTTF("/ipag.ttf",32.0f,NULL,io.Fonts->GetGlyphRangesJapanese());//em++用
+        io.Fonts->AddFontFromFileTTF("/ipag.ttf",32.0f,NULL,io.Fonts->GetGlyphRangesJapanese());//em++用
         // Webはフォントロード失敗しやすいので
         // デフォルトフォントを使う
-        io.Fonts->AddFontDefault();
+        //io.Fonts->AddFontDefault();
     #endif
 
     // Setup Dear ImGui style
@@ -243,7 +243,7 @@ void App::mainLoop()
     // 面
     glEnable(GL_POLYGON_OFFSET_FILL);
     #ifndef __EMSCRIPTEN__
-    glPolygonOffset(1.0f,1.0f);
+    //glPolygonOffset(1.0f,1.0f);
     #endif
     renderer.draw(cube, model1, glm::vec3(0.8f,0.2f,0.2f));
     //renderer.draw(cube, model1, glm::vec3(1.0f,1.0f,0.2f));
@@ -255,15 +255,7 @@ void App::mainLoop()
     //renderer.draw(box,  model3, glm::vec3(0.2f,0.4f,0.8f));
     glDisable(GL_POLYGON_OFFSET_FILL);
 
-    // 線（黒）
-    #ifndef __EMSCRIPTEN__
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    glLineWidth(2.0f);
-    //srenderer.draw(cube, model1, glm::vec3(0.0f,0.0f,0.0f));
-    //renderer.draw(cyl, model2, glm::vec3(0.0f,0.0f,0.0f));
-    //renderer.draw(box, model3, glm::vec3(0.0f,0.0f,0.0f));
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    #endif
+ 
 
     // ImGUI描画（必ず最後）
     glDisable(GL_DEPTH_TEST);
