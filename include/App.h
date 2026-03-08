@@ -1,6 +1,7 @@
 #pragma once
 #include "Renderer.h"
 #include "Camera.h"
+#include "Model.h"
 #include <GLFW/glfw3.h>
 
 class App
@@ -13,9 +14,10 @@ public:
 
 private:
     Renderer renderer;
-    Renderer::Mesh cube;
-    Renderer::Mesh cyl;
-    Renderer::Mesh box;
+    Model cube, axis;
+    // Renderer::Mesh cube;
+    // Renderer::Mesh cyl;
+    // Renderer::Mesh box;
 
     Camera camera;
 

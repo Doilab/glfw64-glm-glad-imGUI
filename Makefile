@@ -1,8 +1,7 @@
 CC=g++
 CC_MINGW64VSC =..\TOOLS\mingw64\bin\g++
 
-APP_SRC = ./src/App.cpp ./src/Renderer.cpp ./src/main.cpp ./src/Camera.cpp ./glad/src/glad.c
-APP_SRC_WEB = ./src/App.cpp ./src/Renderer.cpp ./src/main.cpp ./src/Camera.cpp
+APP_SRC = ./src/App.cpp ./src/Renderer.cpp ./src/main.cpp ./src/Camera.cpp ./src/Model.cpp ./src/ModelBuilder.cpp
 IMGUI_SRC = imGUI/imgui/imgui.cpp imGUI/imgui/imgui_draw.cpp imGUI/imgui/imgui_widgets.cpp imGUI/imgui/imgui_tables.cpp \
     imGUI/imgui/backends/imgui_impl_glfw.cpp imGUI/imgui/backends/imgui_impl_opengl3.cpp 
 IMGUI_SRC_WEB = imGUI/imgui/imgui.cpp imGUI/imgui/imgui_draw.cpp imGUI/imgui/imgui_widgets.cpp imGUI/imgui/imgui_tables.cpp \
@@ -12,13 +11,15 @@ WINOPT = -lglu32 -lopengl32 -static -lstdc++ -lgcc
 all:win64
 
 win64:
-	$(CC_MINGW64VSC) $(APP_SRC)  -I. -I./include -I./imGUI  -I./glm -I./glad/include \
-	-DWIN32  $(IMGUI_SRC)  \
+	$(CC_MINGW64VSC) $(APP_SRC)   $(IMGUI_SRC) ./glad/src/glad.c \
+	-I. -I./include -I./imGUI  -I./glm -I./glad/include \
+	-DWIN32  \
 	./GLFW/lib64/libglfw3dll.a  $(WINOPT) \
 	-o app.exe
 
 linux:
-	$(CC)  $(APP_SRC) $(IMGUI_SRC) -I. -I./include -I./imGUI  -I./glm -I./glad/include \
+	$(CC)  $(APP_SRC) $(IMGUI_SRC) ./glad/src/glad.c \
+	-I. -I./include -I./imGUI  -I./glm -I./glad/include \
 	-I/usr/X11R6/include \
 	-std=c++17 \
     -Wall -Wextra \
@@ -27,7 +28,7 @@ linux:
 	-o app.exe
 
 linux-web:
-	em++ $(APP_SRC_WEB) $(IMGUI_SRC_WEB) \
+	em++ $(APP_SRC) $(IMGUI_SRC_WEB) \
 	-I. -I./include -I./imGUI -I./glm \
 	-s USE_GLFW=3 \
 	-s USE_WEBGL2=1 \

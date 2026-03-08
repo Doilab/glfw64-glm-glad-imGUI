@@ -10,8 +10,8 @@
 #include "imGUI/imgui_impl_opengl3.h"
 
 #include "Renderer.h"
+#include "ModelBuilder.h"
 
-//#define __EMSCRIPTEN__ //Web用
 
 #ifdef __EMSCRIPTEN__
     #include <GLES3/gl3.h>
@@ -21,7 +21,7 @@
 #endif
 
 // カメラ用
-static float fov = 45.0f;
+//static float fov = 45.0f;
 
 // ImGUI用の変数初期化
 float imgui_x = 0.0f, imgui_y = 0.0f;
@@ -74,9 +74,10 @@ void imgui_setup(GLFWwindow* window)
         io.Fonts->AddFontFromFileTTF("ipag.ttf",32.0f,NULL,io.Fonts->GetGlyphRangesJapanese());
         //io.FontGlobalScale = 5;//スケール大きく
     #else
+        //日本語フォント↓260308スマホで成功
         io.Fonts->AddFontFromFileTTF("/ipag.ttf",32.0f,NULL,io.Fonts->GetGlyphRangesJapanese());//em++用
         // Webはフォントロード失敗しやすいので
-        // デフォルトフォントを使う
+        // デフォルトフォントを使う場合↓
         //io.Fonts->AddFontDefault();
     #endif
 
@@ -176,9 +177,8 @@ bool App::init()
 
 
     //ここで形状生成
-    cube = renderer.createCube(0.5f);
-    //cyl  = renderer.createCylinder(0.2f,0.8f,16);
-    //box  = renderer.createBox(0.5f,1.0f,0.2f);
+    cube = ModelBuilder::createCube();
+    axis = ModelBuilder::createAxis(3);
 
     //imGUIの初期設定
     imgui_setup(window);
@@ -197,7 +197,8 @@ void App::mainLoop()
  
 
     // 画面クリア
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);//背景白
+    //glClearColor(0,0,0,1);//背景黒
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     
@@ -237,23 +238,29 @@ void App::mainLoop()
         glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
     camera.processMouse(mouseX, mouseY, pressed);
     renderer.setViewMatrix(camera.getViewMatrix());
+    //glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0,0,-5));
+    //renderer.setViewMatrix(view);
 
 
     // 描画
     // 面
     glEnable(GL_POLYGON_OFFSET_FILL);
-    #ifndef __EMSCRIPTEN__
-    //glPolygonOffset(1.0f,1.0f);
-    #endif
-    renderer.draw(cube, model1, glm::vec3(0.8f,0.2f,0.2f));
-    //renderer.draw(cube, model1, glm::vec3(1.0f,1.0f,0.2f));
-    renderer.drawEdges(cube, model1, glm::vec3(0.0f,0.0f,0.0f));
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cube.edgeEBO);
-    //glDrawElements(GL_LINES, cube.edgeIndexCount, GL_UNSIGNED_INT, 0);
+    glPolygonOffset(1.0, 1.0);
 
-    //renderer.draw(cyl,  model2, glm::vec3(0.2f,0.8f,0.2f));
-    //renderer.draw(box,  model3, glm::vec3(0.2f,0.4f,0.8f));
+    renderer.draw(cube, model1, glm::vec3(0.8,0.0,0.0), GL_TRIANGLES);
+
     glDisable(GL_POLYGON_OFFSET_FILL);
+
+    // エッジ
+    glLineWidth(2.0f);
+    renderer.draw(cube, model1, glm::vec3(0,0,0), GL_LINES);
+
+    // Axis
+    glLineWidth(3.0f);
+    renderer.draw(axis, model1, glm::vec3(1,0,0), GL_LINES);
+    
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);//ワイヤーフレームでデバッグ
+    //renderer.draw(cube, model1, glm::vec3(0,0,0));
 
  
 
@@ -268,8 +275,6 @@ void App::mainLoop()
 void App::shutdown()
 {
     cube.cleanup();
-    //cyl.cleanup();
-    //box.cleanup(); 
 
     ImGui_ImplOpenGL3_Shutdown();
     #ifdef __EMSCRIPTEN__
