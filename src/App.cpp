@@ -119,8 +119,8 @@ void imgui_begin(GLFWwindow* window)
 void imgui_draw()
 {
     // ImGUI描画内容セット
-    ImGui::Begin(u8"Hello, world!日本語3");
-    ImGui::Text("This is some useful text. %d", 123);
+    ImGui::Begin(u8"update 260309");
+    ImGui::Text("日本語. %d", 123);
     ImGui::DragFloat("x", &imgui_x);
     ImGui::DragFloat("y", &imgui_y);
     ImGui::End();
