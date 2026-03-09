@@ -1,5 +1,6 @@
 #include "App.h"
 #include <GLFW/glfw3.h>
+#include "GLHeaders.h"
 
 
 #include <iostream>
@@ -11,7 +12,7 @@
 
 #include "Renderer.h"
 #include "ModelBuilder.h"
-#include "GLHeaders.h"
+#include "SceneObject.h"
 
 #ifdef __EMSCRIPTEN__
     #include <emscripten.h>
@@ -132,6 +133,63 @@ void imgui_end()
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 //----------------------
+void App::modelling()
+{
+    //モデリング処理．事前に生成しておく．
+    axis3 = ModelBuilder::create3Axis(2);
+    xAxis = ModelBuilder::createXAxis(2);
+    yAxis = ModelBuilder::createYAxis(2);
+    zAxis = ModelBuilder::createZAxis(2);
+    cube = ModelBuilder::createCube(1);
+    cyl = ModelBuilder::createCylinder(0.1f,0.5f,8);
+
+    root = std::make_shared<SceneObject>();
+
+    auto xNode = std::make_shared<SceneObject>();
+    xNode->model = &xAxis;
+    xNode->color = {1,0,0};
+    xNode->mode  = GL_LINES;
+
+    root->addChild(xNode);
+
+    auto yNode = std::make_shared<SceneObject>();
+    yNode->model = &yAxis;
+    yNode->color = {0,1,0};
+    yNode->mode  = GL_LINES;
+
+    root->addChild(yNode);
+
+    auto zNode = std::make_shared<SceneObject>();
+    zNode->model = &zAxis;
+    zNode->color = {0,0,1};
+    zNode->mode  = GL_LINES;
+
+    root->addChild(zNode);
+
+    bodyNode = std::make_shared<SceneObject>();
+    bodyNode->model = &cube;
+    bodyNode->color = {0.0f, 0.5f, 0.0f};
+    bodyNode->mode  = GL_LINES;
+
+    root->addChild(bodyNode);
+
+
+    link1Node = std::make_shared<SceneObject>();
+    link1Node->model = &cyl;
+    link1Node->color = {0.0f, 0.5f, 0.0f};
+    link1Node->mode  = GL_TRIANGLES;
+    
+    float theta = glm::radians(45.0f);
+    auto move_vec = glm::vec3(1,0,0);
+    link1Node->transform = glm::rotate(glm::mat4(1), theta, {1,0,0});
+    link1Node->transform = glm::translate(glm::mat4(1), move_vec);
+    root->addChild(link1Node);
+
+
+
+
+}
+//----------------------
 bool App::init()
 {
     if (!glfwInit())
@@ -173,12 +231,7 @@ bool App::init()
 
 
     //ここで形状生成
-    axis3 = ModelBuilder::create3Axis(2);
-    xAxis = ModelBuilder::createXAxis(2);
-    yAxis = ModelBuilder::createYAxis(2);
-    zAxis = ModelBuilder::createZAxis(2);
-    cube = ModelBuilder::createCube(1);
-    cyl = ModelBuilder::createCylinder(0.5f,1.0f,16);
+    modelling();
     
     //imGUIの初期設定
     imgui_setup(window);
@@ -186,6 +239,7 @@ bool App::init()
     return true;
 }
 
+//------------------------------------
 void App::mainLoop()
 {
     glfwPollEvents();
@@ -208,6 +262,7 @@ void App::mainLoop()
     glfwGetFramebufferSize(window, &width, &height);
     glViewport(0, 0, width, height);
 
+    //視点決定
     if (height > 0) {
         glm::mat4 p = glm::perspective(
         glm::radians(45.0f),
@@ -249,7 +304,7 @@ void App::mainLoop()
     glPolygonOffset(1.0, 1.0);
 
     renderer.draw(cube, model1, glm::vec3(0.8,0.0,0.0), GL_TRIANGLES);
-    renderer.draw(cyl, model2, glm::vec3(0.0,0.8,0.0), GL_TRIANGLES);
+    //renderer.draw(cyl, model2, glm::vec3(0.0,0.8,0.0), GL_TRIANGLES);
 
     glDisable(GL_POLYGON_OFFSET_FILL);
 
@@ -257,8 +312,9 @@ void App::mainLoop()
     //glDisable(GL_DEPTH_TEST);
     glLineWidth(2.0f);
     renderer.drawEdges(cube,model1,glm::vec3(0.0,0.0,0.0));
-    renderer.drawEdges(cyl,model2,glm::vec3(0.0,0.0,0.0));
+    //renderer.drawEdges(cyl,model2,glm::vec3(0.0,0.0,0.0));
     //glEnable(GL_DEPTH_TEST);
+
 
     // Axis
     glLineWidth(3.0f);
@@ -267,10 +323,10 @@ void App::mainLoop()
     renderer.draw(yAxis, model1, glm::vec3(0,1,0), GL_LINES);
     renderer.draw(zAxis, model1, glm::vec3(0,0,1), GL_LINES);
     
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);//ワイヤーフレームでデバッグ
-    //renderer.draw(cube, model1, glm::vec3(0,0,0));
 
- 
+
+    //SceneObject描画
+    root->draw(renderer, model2);
 
     // ImGUI描画（必ず最後）
     glDisable(GL_DEPTH_TEST);

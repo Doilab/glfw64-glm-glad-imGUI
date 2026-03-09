@@ -2,6 +2,7 @@
 #include "Renderer.h"
 #include "Camera.h"
 #include "Model.h"
+#include "SceneObject.h"
 #include <GLFW/glfw3.h>
 
 class App
@@ -17,8 +18,11 @@ private:
     Model cube, cyl;
     Model axis3, xAxis, yAxis, zAxis;
 
-    Camera camera;
+    std::shared_ptr<SceneObject> root;
+    std::shared_ptr<SceneObject> bodyNode;
+    std::shared_ptr<SceneObject> link1Node;
 
+    Camera camera;
 	GLFWwindow* window = nullptr;
 
     // --- メイン処理 ---  
@@ -26,6 +30,7 @@ private:
     void mainLoop();
     void shutdown();
     friend void loopProxy(void*);//Web用
+    void modelling();
   
 
     // --- コールバック関連 ---
