@@ -20,7 +20,8 @@ private:
 
     std::shared_ptr<SceneObject> root;
     std::shared_ptr<SceneObject> bodyNode;
-    std::shared_ptr<SceneObject> link1Node;
+    std::shared_ptr<SceneObject> link11Node;
+    std::shared_ptr<SceneObject> link12Node;
 
     Camera camera;
 	GLFWwindow* window = nullptr;
@@ -31,6 +32,7 @@ private:
     void shutdown();
     friend void loopProxy(void*);//Web用
     void modelling();
+    void AttachAxis(std::shared_ptr<SceneObject> obj);
   
 
     // --- コールバック関連 ---

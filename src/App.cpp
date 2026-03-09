@@ -122,7 +122,7 @@ void imgui_draw()
     // ImGUI描画内容セット
     ImGui::Begin(u8"update 260309");
     //ImGui::Text("日本語. %d", 123);
-    ImGui::Text("経過時間. %.1f", now_second);
+    ImGui::Text("経過時間. %.5f", now_second);
     ImGui::DragFloat("x", &imgui_x);
     ImGui::DragFloat("y", &imgui_y);
     ImGui::End();
@@ -133,6 +133,27 @@ void imgui_end()
 {
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+//----------------------
+void App::AttachAxis(std::shared_ptr<SceneObject> obj)
+{
+    auto x = std::make_shared<SceneObject>();
+    x->model = &xAxis;
+    x->color = {1,0,0};
+    x->mode = GL_LINES;
+    obj->addChild(x);
+
+    auto y = std::make_shared<SceneObject>();
+    y->model = &yAxis;
+    y->color = {0,1,0};
+    y->mode = GL_LINES;
+    obj->addChild(y);
+
+    auto z = std::make_shared<SceneObject>();
+    z->model = &zAxis;
+    z->color = {0,0,1};
+    z->mode = GL_LINES;
+    obj->addChild(z);
 }
 //----------------------
 void App::modelling()
@@ -147,45 +168,38 @@ void App::modelling()
 
     root = std::make_shared<SceneObject>();
 
-    auto xNode = std::make_shared<SceneObject>();
-    xNode->model = &xAxis;
-    xNode->color = {1,0,0};
-    xNode->mode  = GL_LINES;
-
-    root->addChild(xNode);
-
-    auto yNode = std::make_shared<SceneObject>();
-    yNode->model = &yAxis;
-    yNode->color = {0,1,0};
-    yNode->mode  = GL_LINES;
-
-    root->addChild(yNode);
-
-    auto zNode = std::make_shared<SceneObject>();
-    zNode->model = &zAxis;
-    zNode->color = {0,0,1};
-    zNode->mode  = GL_LINES;
-
-    root->addChild(zNode);
-
     bodyNode = std::make_shared<SceneObject>();
     bodyNode->model = &cube;
     bodyNode->color = {0.0f, 0.5f, 0.0f};
     bodyNode->mode  = GL_LINES;
+    AttachAxis(bodyNode);
 
     root->addChild(bodyNode);
 
 
-    link1Node = std::make_shared<SceneObject>();
-    link1Node->model = &cyl;
-    link1Node->color = {0.0f, 0.5f, 0.0f};
-    link1Node->mode  = GL_TRIANGLES;
+    link11Node = std::make_shared<SceneObject>();
+    link11Node->model = &cyl;
+    link11Node->color = {0.0f, 0.5f, 0.0f};
+    link11Node->mode  = GL_TRIANGLES;
     
-    float theta = glm::radians(45.0f);
-    auto move_vec = glm::vec3(1,0,0);
-    link1Node->transform = glm::rotate(glm::mat4(1), theta, {1,0,0});
-    link1Node->transform = glm::translate(glm::mat4(1), move_vec);
-    root->addChild(link1Node);
+    float theta = glm::radians(90.0f);
+    auto move_vec = glm::vec3(0,0,1);
+    link11Node->transform = glm::rotate(glm::mat4(1), theta, {0,0,1});
+    link11Node->transform = glm::translate(glm::mat4(1), move_vec);
+    bodyNode->addChild(link11Node);
+    AttachAxis(link11Node);
+    
+    link12Node = std::make_shared<SceneObject>();
+    link12Node->model = &cyl;
+    link12Node->color = {0.0f, 0.0f, 0.5f};
+    link12Node->mode  = GL_TRIANGLES;
+    
+    theta = glm::radians(45.0f);
+    move_vec = glm::vec3(0,0,1);
+    link12Node->transform = glm::rotate(glm::mat4(1), theta, {0,0,1});
+    link12Node->transform = glm::translate(glm::mat4(1), move_vec);
+    link11Node->addChild(link12Node);
+    AttachAxis(link12Node);
 
 
 
