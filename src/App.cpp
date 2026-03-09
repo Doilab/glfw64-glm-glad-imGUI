@@ -20,6 +20,7 @@
 
 // ImGUI用の変数初期化
 float imgui_x = 0.0f, imgui_y = 0.0f;
+float now_second = 0;
 
 App::App()
 {
@@ -120,7 +121,8 @@ void imgui_draw()
 {
     // ImGUI描画内容セット
     ImGui::Begin(u8"update 260309");
-    ImGui::Text("日本語. %d", 123);
+    //ImGui::Text("日本語. %d", 123);
+    ImGui::Text("経過時間. %.1f", now_second);
     ImGui::DragFloat("x", &imgui_x);
     ImGui::DragFloat("y", &imgui_y);
     ImGui::End();
@@ -273,6 +275,7 @@ void App::mainLoop()
     }
     
     float time = glfwGetTime();
+    now_second = (time/1000);
     float currentFrame = time;
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;

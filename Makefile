@@ -41,6 +41,7 @@ linux-web:
 	-s ALLOW_MEMORY_GROWTH=1 \
 	-fexceptions \
 	--preload-file ipag.ttf \
+	--preload-file shaders \
 	-Wno-nontrivial-memcall \
 	-O2 \
 	-o docs/index.html

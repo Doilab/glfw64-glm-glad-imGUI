@@ -9,23 +9,21 @@
 
 class Renderer
 {
-public:
-
 private:
+    GLuint shader;
     unsigned int shaderProgram;
-    unsigned int mvpLoc;
-    unsigned int colorLoc;
+
+    GLint mvpLoc;
+    GLint colorLoc;
 
     glm::mat4 projection;
     glm::mat4 view;
-
-    unsigned int createShader(const char* vs,
-                              const char* fs);
+    unsigned int createShader( const char* vs, const char* fs);
 
 public:
+    Renderer();
     bool init(int width, int height);
-    void setProjection(const glm::mat4& proj);
-    void setViewMatrix(const glm::mat4& v);
+
 
     void draw(Model& model,
             const glm::mat4& modelMat,
@@ -35,6 +33,8 @@ public:
         const glm::mat4& modelMat,
         const glm::vec3& color);
 
+    void setProjection(const glm::mat4& proj);
+    void setViewMatrix(const glm::mat4& v);
    
 };
 

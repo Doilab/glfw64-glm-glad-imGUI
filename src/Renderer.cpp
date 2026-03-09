@@ -2,57 +2,34 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
-#ifndef __EMSCRIPTEN__
-static const char* vertexShaderSource = R"(#version 330 core
-layout (location = 0) in vec3 aPos;
 
-uniform mat4 MVP;
-
-void main()
+std::string loadFile(const std::string& path)
 {
-    gl_Position = MVP * vec4(aPos, 1.0);
-})";
-static const char* fragmentShaderSource = R"(#version 330 core
-uniform vec3 color;
+    std::ifstream f(path);
 
-out vec4 FragColor;
+        if (!f.is_open()) {
+        std::cout << "Failed to open: " << path << std::endl;
+        return "";
+    }
 
-void main()
+    std::stringstream ss;
+    ss << f.rdbuf();
+    return ss.str();
+}
+
+Renderer::Renderer()
 {
-    FragColor = vec4(color, 1.0);
-})";
-#else
-static const char* vertexShaderSource = R"(#version 300 es
-precision mediump float;
+    shaderProgram = 0;
+    mvpLoc = -1;
+    colorLoc = -1;
 
-layout (location = 0) in vec3 aPos;
+}
 
-uniform mat4 MVP;
-
-void main()
+unsigned int Renderer::createShader(const char* vs, const char* fs)
 {
-    gl_Position = MVP * vec4(aPos, 1.0);
-})";
-static const char* fragmentShaderSource = R"(#version 300 es
-precision mediump float;
-
-uniform vec3 color;
-
-out vec4 FragColor;
-
-void main()
-{
-    FragColor = vec4(color, 1.0);
-})";
-#endif
-
-
-unsigned int Renderer::createShader(
-    const char* vs,
-    const char* fs)
-{
-
     unsigned int vertex = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertex, 1, &vs, NULL);
     glCompileShader(vertex);
@@ -70,6 +47,12 @@ unsigned int Renderer::createShader(
     glShaderSource(fragment, 1, &fs, NULL);
     glCompileShader(fragment);
 
+    glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        glGetShaderInfoLog(fragment, 512, NULL, infoLog);
+        std::cout << "Fragment Shader Error:\n" << infoLog << std::endl;
+    }
+
     unsigned int program = glCreateProgram();
     glAttachShader(program, vertex);
     glAttachShader(program, fragment);
@@ -83,9 +66,22 @@ unsigned int Renderer::createShader(
 
 bool Renderer::init(int width, int height)
 {
+    #ifdef __EMSCRIPTEN__
+    auto vert = loadFile("/shaders/basic_webgl.vert");
+    auto frag = loadFile("/shaders/basic_webgl.frag");
+    #else
+    auto vert = loadFile("./shaders/basic_gl.vert");
+    auto frag = loadFile("./shaders/basic_gl.frag");
+    #endif    
+    
+    std::cout << "vert size = " << vert.size() << std::endl;
+    std::cout << "frag size = " << frag.size() << std::endl;
+
     shaderProgram = createShader(
-        vertexShaderSource,
-        fragmentShaderSource);
+        vert.c_str(),
+        frag.c_str()
+    );
+
 
     mvpLoc = glGetUniformLocation(shaderProgram, "MVP");
     colorLoc = glGetUniformLocation(shaderProgram, "color");
@@ -135,7 +131,6 @@ void Renderer::drawEdges(Model& model,
     model.drawEdges();
 }
 //----------------------------
-
 
 
 
