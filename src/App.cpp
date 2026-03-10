@@ -160,87 +160,138 @@ void App::AttachAxis(std::shared_ptr<SceneObject> obj)
     obj->addChild(z);
 }
 //----------------------
+std::shared_ptr<SceneObject> App::makeJoint(
+    std::shared_ptr<SceneObject> parent,
+    glm::vec3 pos,
+    float angle,
+    glm::vec3 axis)
+{
+    auto node = std::make_shared<SceneObject>();
+
+    glm::mat4 M = glm::mat4(1);
+    M = glm::translate(M, pos);
+    M = glm::rotate(M, glm::radians(angle), axis);
+
+    node->transform = M;
+
+    parent->addChild(node);
+    AttachAxis(node);
+
+    return node;
+}
+//----------------------
+std::shared_ptr<SceneObject> App::makeLink(
+    std::shared_ptr<SceneObject> parent,
+    Model* model,
+    glm::vec3 pos,
+    glm::vec3 color)
+{
+    auto node = std::make_shared<SceneObject>();
+
+    node->model = model;
+    node->color = color;
+    node->mode  = GL_TRIANGLES;
+
+    glm::mat4 M = glm::translate(glm::mat4(1), pos);
+    node->transform = M;
+
+    parent->addChild(node);
+
+    return node;
+}
+
+Joint& App::addJoint(Leg& leg, std::shared_ptr<SceneObject> node)
+{
+    Joint j;
+    j.node = node;
+    leg.joints.push_back(j);
+    return leg.joints.back();
+}
+//-----------------------
+std::shared_ptr<SceneObject> App::makeRobotJoint(
+    Leg& leg,
+    std::shared_ptr<SceneObject> parent,
+    glm::vec3 pos,
+    float angle,
+    glm::vec3 axis)
+{
+    auto node = makeJoint(parent,pos,angle,axis);
+
+    Joint j;
+    j.node = node;
+    j.pos  = pos;
+    j.axis = axis;
+    j.angle = angle;
+
+    j.baseTransform = node->transform;
+
+    leg.joints.push_back(j);
+
+    return node;
+}
+//----------------------
 void App::modelling()
 {
     //モデリング処理．事前に生成しておく．
     axis3 = ModelBuilder::create3Axis(2);
-    xAxis = ModelBuilder::createXAxis(1);
-    yAxis = ModelBuilder::createYAxis(1);
-    zAxis = ModelBuilder::createZAxis(1);
-    cube = ModelBuilder::createCube(1);
-    cyl = ModelBuilder::createCylinder(0.1f,1.0f,8);
-    link = ModelBuilder::createBox(1.0f,0.1f,0.1f);;
+    xAxis = ModelBuilder::createXAxis(0.5);
+    yAxis = ModelBuilder::createYAxis(0.5);
+    zAxis = ModelBuilder::createZAxis(0.5);
+    cube = ModelBuilder::createCube(0.5);
+    cyl = ModelBuilder::createCylinder(0.05f,0.5f,8);
+    link = ModelBuilder::createBox(0.5f,0.05f,0.1f);
     body = ModelBuilder::createBox(1.0f,0.8f,0.1f);
+    ground = ModelBuilder::createBox(2.0f,2.0f,0.01f);
 
     root = std::make_shared<SceneObject>();
 
-    bodyNode = std::make_shared<SceneObject>();
-    bodyNode->model = &body;
-    bodyNode->color = {0.0f, 0.5f, 0.0f};
-    bodyNode->mode  = GL_LINES;
-    AttachAxis(bodyNode);
+    auto  BodyJntNode = makeJoint(root, {0.0,0.0,0.5}, 0, {0,0,1});
 
-    root->addChild(bodyNode);
+    Leg leg1;
 
-    glm::mat4 M = glm::mat4(1.0f);//座標変換行列用意
+
+    auto Jnt11Node = makeRobotJoint(leg1, BodyJntNode, {0.5,0.4,0}, 30, {0,0,1});
+
+    auto Jnt12Node = makeRobotJoint(leg1, Jnt11Node, {0,0,0}, 45, {0,1,0});
+
+    auto Jnt13Node = makeRobotJoint(leg1, Jnt12Node, {0.5,0,0}, 30, {0,1,0});
+
+    //リンク（肉）の設定
+    auto GndNode = makeLink(root, &ground, {0,0,0}, {0,0,0});
+    GndNode->mode = GL_LINES;
+    auto BodyNode = makeLink(BodyJntNode, &body, {0,0,0}, {0,0.5,0});
+    BodyNode->mode  = GL_LINES;
+    auto link11Node = makeLink(Jnt12Node, &link, {0.25,0,0}, {0,0.5,0});
+    auto link12Node = makeLink(Jnt13Node, &link, {0.25,0,0}, {0,0,0.5});
     
-    //ジョイント作成
-    Jnt11Node = std::make_shared<SceneObject>();
-    Jnt11Node->model = nullptr;
-    M = glm::mat4(1);
-    M = glm::translate(M, glm::vec3(0.5,0.4,0));//ジョイント基準原点合わせ
-    M = glm::rotate(M, glm::radians(45.0f), {0,0,1});//回転角
-    Jnt11Node->transform = M;
-    bodyNode->addChild(Jnt11Node);//bodyにつける
-    AttachAxis(Jnt11Node);
-
-    //ジョイント作成
-    Jnt12Node = std::make_shared<SceneObject>();
-    Jnt12Node->model = nullptr;
-    M = glm::mat4(1);
-    M = glm::translate(M, glm::vec3(0.0,0.0,0));//ジョイント基準原点合わせ
-    M = glm::rotate(M, glm::radians(45.0f), {0,1,0});//回転角
-    Jnt12Node->transform = M;
-    Jnt11Node->addChild(Jnt12Node);//Jnt11につける
-    AttachAxis(Jnt12Node);
-
-    //リンク作成
-    link11Node = std::make_shared<SceneObject>();
-    link11Node->model = &link;
-    link11Node->color = {0.0f, 0.5f, 0.0f};
-    link11Node->mode  = GL_TRIANGLES;
-    M = glm::mat4(1);
-    M = glm::translate(M, glm::vec3(0.5,0,0));//物体座標系原点合わせ
-    link11Node->transform = M;
-    Jnt12Node->addChild(link11Node);//Jnt12につける
-    //AttachAxis(link11Node);
-
-    //ジョイント作成
-    Jnt13Node = std::make_shared<SceneObject>();
-    Jnt13Node->model = nullptr;
-    M = glm::mat4(1);
-    M = glm::translate(M, glm::vec3(1.0, 0.0, 0.0));//リンク基準原点合わせ
-    M = glm::rotate(M, glm::radians(30.0f), {0,1,0});//リンク回転角
-    Jnt13Node->transform = M;
-    Jnt12Node->addChild(Jnt13Node);//二番目のジョイントはlinkではなくJnt12につける
-    AttachAxis(Jnt13Node);
-    
-    //リンク作成
-    link12Node = std::make_shared<SceneObject>();
-    link12Node->model = &cyl;
-    link12Node->color = {0.0f, 0.0f, 0.5f};
-    link12Node->mode  = GL_TRIANGLES;
-    M = glm::mat4(1);
-    M = glm::translate(M, glm::vec3(0.5, 0.0, 0.0));//リンク基準原点合わせ
-    M = glm::rotate(M, glm::radians(90.0f), {0,0,1});
-    link12Node->transform = M;
-    Jnt13Node->addChild(link12Node);//Jnt13につける
-    //AttachAxis(link12Node);
-
-
+    legs.push_back(leg1);
 
 
 }
+//----------------------
+void App::update(float t)
+{
+    //関節角を変えるアニメーション関数
+    float omega = 2.0f;
+
+    for(auto &leg : legs)
+    {
+        for(size_t i=0;i<leg.joints.size();i++)
+        {
+            Joint &j = leg.joints[i];
+
+            j.angle = glm::radians(30.0f) * sin(omega * t);
+
+            glm::mat4 M = j.baseTransform;   // ★初期姿勢
+
+            //M = glm::translate(M, j.pos);
+            M = glm::rotate(M, j.angle, j.axis);
+
+            j.node->transform = M;
+        }
+    }
+}
+
 //----------------------
 bool App::init()
 {
@@ -376,6 +427,7 @@ void App::mainLoop()
     renderer.draw(zAxis, model1, glm::vec3(0,0,1), GL_LINES);
     
 
+    update(time);//モデリングレベルでのアニメーション
 
     //SceneObject描画
     root->draw(renderer, model2);
