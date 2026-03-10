@@ -7,6 +7,7 @@ class ModelBuilder
 public:
 
     static Model createCube(float size = 1.0f);
+    static Model createBox(float w, float h, float d);
     static Model create3Axis(float length = 1.0f);
     static Model createXAxis(float L=1.0f);
     static Model createYAxis(float L=1.0f);

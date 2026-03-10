@@ -15,11 +15,14 @@ public:
 
 private:
     Renderer renderer;
-    Model cube, cyl;
+    Model cube, cyl, link, body;
     Model axis3, xAxis, yAxis, zAxis;
 
     std::shared_ptr<SceneObject> root;
     std::shared_ptr<SceneObject> bodyNode;
+    std::shared_ptr<SceneObject> Jnt11Node;
+    std::shared_ptr<SceneObject> Jnt12Node;
+    std::shared_ptr<SceneObject> Jnt13Node;
     std::shared_ptr<SceneObject> link11Node;
     std::shared_ptr<SceneObject> link12Node;
 

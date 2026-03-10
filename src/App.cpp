@@ -84,7 +84,6 @@ void imgui_setup(GLFWwindow* window)
     //ImGui::StyleColorsClassic();
 
     // Setup Platform/Renderer bindings
-    //ImGui_ImplGlfwGL3_Init(window, true);
     #ifdef __EMSCRIPTEN__
         ImGui_ImplOpenGL3_Init("#version 300 es");//for emcc web用
     #else
@@ -114,13 +113,18 @@ void imgui_begin(GLFWwindow* window)
 
     ImGui_ImplOpenGL3_NewFrame();
     ImGui::NewFrame();
+
+    
+    ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(300, 100), ImGuiCond_FirstUseEver);
+
 }
 
 //----------------------
 void imgui_draw()
 {
     // ImGUI描画内容セット
-    ImGui::Begin(u8"update 260309");
+    ImGui::Begin(u8"update 260310");
     //ImGui::Text("日本語. %d", 123);
     ImGui::Text("経過時間. %.5f", now_second);
     ImGui::DragFloat("x", &imgui_x);
@@ -160,46 +164,78 @@ void App::modelling()
 {
     //モデリング処理．事前に生成しておく．
     axis3 = ModelBuilder::create3Axis(2);
-    xAxis = ModelBuilder::createXAxis(2);
-    yAxis = ModelBuilder::createYAxis(2);
-    zAxis = ModelBuilder::createZAxis(2);
+    xAxis = ModelBuilder::createXAxis(1);
+    yAxis = ModelBuilder::createYAxis(1);
+    zAxis = ModelBuilder::createZAxis(1);
     cube = ModelBuilder::createCube(1);
-    cyl = ModelBuilder::createCylinder(0.1f,0.5f,8);
+    cyl = ModelBuilder::createCylinder(0.1f,1.0f,8);
+    link = ModelBuilder::createBox(1.0f,0.1f,0.1f);;
+    body = ModelBuilder::createBox(1.0f,0.8f,0.1f);
 
     root = std::make_shared<SceneObject>();
 
     bodyNode = std::make_shared<SceneObject>();
-    bodyNode->model = &cube;
+    bodyNode->model = &body;
     bodyNode->color = {0.0f, 0.5f, 0.0f};
     bodyNode->mode  = GL_LINES;
     AttachAxis(bodyNode);
 
     root->addChild(bodyNode);
 
+    glm::mat4 M = glm::mat4(1.0f);//座標変換行列用意
+    
+    //ジョイント作成
+    Jnt11Node = std::make_shared<SceneObject>();
+    Jnt11Node->model = nullptr;
+    M = glm::mat4(1);
+    M = glm::translate(M, glm::vec3(0.5,0.4,0));//ジョイント基準原点合わせ
+    M = glm::rotate(M, glm::radians(45.0f), {0,0,1});//回転角
+    Jnt11Node->transform = M;
+    bodyNode->addChild(Jnt11Node);//bodyにつける
+    AttachAxis(Jnt11Node);
 
+    //ジョイント作成
+    Jnt12Node = std::make_shared<SceneObject>();
+    Jnt12Node->model = nullptr;
+    M = glm::mat4(1);
+    M = glm::translate(M, glm::vec3(0.0,0.0,0));//ジョイント基準原点合わせ
+    M = glm::rotate(M, glm::radians(45.0f), {0,1,0});//回転角
+    Jnt12Node->transform = M;
+    Jnt11Node->addChild(Jnt12Node);//Jnt11につける
+    AttachAxis(Jnt12Node);
+
+    //リンク作成
     link11Node = std::make_shared<SceneObject>();
-    link11Node->model = &cyl;
+    link11Node->model = &link;
     link11Node->color = {0.0f, 0.5f, 0.0f};
     link11Node->mode  = GL_TRIANGLES;
+    M = glm::mat4(1);
+    M = glm::translate(M, glm::vec3(0.5,0,0));//物体座標系原点合わせ
+    link11Node->transform = M;
+    Jnt12Node->addChild(link11Node);//Jnt12につける
+    //AttachAxis(link11Node);
+
+    //ジョイント作成
+    Jnt13Node = std::make_shared<SceneObject>();
+    Jnt13Node->model = nullptr;
+    M = glm::mat4(1);
+    M = glm::translate(M, glm::vec3(1.0, 0.0, 0.0));//リンク基準原点合わせ
+    M = glm::rotate(M, glm::radians(30.0f), {0,1,0});//リンク回転角
+    Jnt13Node->transform = M;
+    Jnt12Node->addChild(Jnt13Node);//二番目のジョイントはlinkではなくJnt12につける
+    AttachAxis(Jnt13Node);
     
-    float theta = glm::radians(90.0f);
-    auto move_vec = glm::vec3(0,0,1);
-    link11Node->transform = glm::rotate(glm::mat4(1), theta, {0,0,1});
-    link11Node->transform = glm::translate(glm::mat4(1), move_vec);
-    bodyNode->addChild(link11Node);
-    AttachAxis(link11Node);
-    
+    //リンク作成
     link12Node = std::make_shared<SceneObject>();
     link12Node->model = &cyl;
     link12Node->color = {0.0f, 0.0f, 0.5f};
     link12Node->mode  = GL_TRIANGLES;
-    
-    theta = glm::radians(45.0f);
-    move_vec = glm::vec3(0,0,1);
-    link12Node->transform = glm::rotate(glm::mat4(1), theta, {0,0,1});
-    link12Node->transform = glm::translate(glm::mat4(1), move_vec);
-    link11Node->addChild(link12Node);
-    AttachAxis(link12Node);
+    M = glm::mat4(1);
+    M = glm::translate(M, glm::vec3(0.5, 0.0, 0.0));//リンク基準原点合わせ
+    M = glm::rotate(M, glm::radians(90.0f), {0,0,1});
+    link12Node->transform = M;
+    Jnt13Node->addChild(link12Node);//Jnt13につける
+    //AttachAxis(link12Node);
 
 
 
@@ -289,18 +325,18 @@ void App::mainLoop()
     }
     
     float time = glfwGetTime();
-    now_second = (time/1000);
+    now_second = (time);
     float currentFrame = time;
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
 
     //アニメーションのためのモデル行列
     glm::mat4 model1 = glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f,0.0f,0.0f));
-    model1 = glm::rotate(model1, time, glm::vec3(1,1,0));
+    model1 = glm::rotate(model1, (time*0.5f), glm::vec3(1,1,0));
+    model1 = glm::scale(model1,glm::vec3(0.2,0.2,0.2));
     glm::mat4 model2 = glm::translate(glm::mat4(1.0f), glm::vec3(1.0f,0.0f,0.0f));
-    model2 = glm::rotate(model2, time, glm::vec3(1,1,0));
-    glm::mat4 model3 = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f,0.0f,0.0f));
-    model3 = glm::rotate(model3, time, glm::vec3(1,1,0));
+    model2 = glm::rotate(model2, time*0.5f, glm::vec3(1,1,0));
+    
 
     // 毎フレームカメラ更新
     camera.processKeyboard(window, deltaTime);
@@ -310,8 +346,7 @@ void App::mainLoop()
         glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
     camera.processMouse(mouseX, mouseY, pressed);
     renderer.setViewMatrix(camera.getViewMatrix());
-    //glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0,0,-5));
-    //renderer.setViewMatrix(view);
+   
 
 
     // 描画
