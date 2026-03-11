@@ -4,11 +4,6 @@ A minimal OpenGL starter project using:
 2026.3.1 -
 
 
-- GLFW (window / input)
-- GLAD (OpenGL loader)
-- GLM (math library)
-- Dear ImGui (debug UI)
-
 This project provides a simple structure for experimenting with OpenGL rendering.
 
 ---
@@ -49,11 +44,15 @@ localhost:8080
 
 ## Project Structure
 
-
 src/
-Renderer.cpp
+App.cpp
+Camera.cpp
+GUI.cpp
 Model.cpp
 ModelBuilder.cpp
+Renderer.cpp
+Robot.h
+SceneObject.cpp
 
 third_party/
 imgui/
@@ -72,12 +71,12 @@ GLFW/
 
 make linux-web
 
-### Linux / macOS
+### Linux (g++)
 
 
 make linux
 
-### Windows (MinGW)
+### Windows (MinGW g++)
 
 
 make win64
@@ -87,10 +86,10 @@ make win64
 
 ## Dependencies
 
-- GLFW
-- GLAD
-- GLM
-- Dear ImGui
+- GLFW (window / input)
+- GLAD (OpenGL loader)
+- GLM (math library)
+- Dear ImGui (debug UI)
 
 ---
 
@@ -98,13 +97,13 @@ make win64
 
 ## Future improvements
 
-OBJ loader
-
-Lighting
-
-Texture support
-
 Camera system
+
+STL loader
+
+JSON support
+
+WebSocket
 
 License
 
