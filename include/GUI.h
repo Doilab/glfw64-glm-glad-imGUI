@@ -1,7 +1,6 @@
 #pragma once
 
 #include "GLHeaders.h"
-//#include <GLFW/glfw3.h>
 #include "Robot.h"
 
 class Gui

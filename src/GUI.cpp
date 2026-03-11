@@ -88,7 +88,7 @@ void Gui::draw()
 {
     ImGui::Begin(u8"update 260311");
 
-    ImGui::Text("経過時間 %.5f", now_second);
+    ImGui::Text("経過時間 %.2f", now_second);
 
     ImGui::DragFloat("x",&imgui_x);
     ImGui::DragFloat("y",&imgui_y);

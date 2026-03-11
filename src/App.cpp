@@ -25,7 +25,7 @@ Gui gui;
 
 
 //--------------------------
-App::App():robot1(3)//初期値設定robot1(3)
+App::App():robot1(12)//初期値設定robot1(12)12自由度
 {
 }
 
@@ -166,35 +166,64 @@ void App::modelling()
 
     root = std::make_shared<SceneObject>();
 
+    //ジョイント（骨）設定
     auto  BodyJntNode = makeJoint(root, {0.0,0.0,0.5}, 0, {0,0,1});
 
-/*    Leg leg1;
+    auto j11 = makeJoint(BodyJntNode,{0.5,0.4,0},30,{0,0,1});
+    robot1.addJoint(j11,{0,0,1});
+
+    auto j12 = makeJoint(j11,{0,0,0},45,{0,1,0});
+    robot1.addJoint(j12,{0,1,0});
+
+    auto j13 = makeJoint(j12,{0.5,0,0},30,{0,1,0});
+    robot1.addJoint(j13,{0,1,0});
+
+    auto j21 = makeJoint(BodyJntNode,{-0.5,0.4,0},30,{0,0,1});
+    robot1.addJoint(j21,{0,0,1});
+
+    auto j22 = makeJoint(j21,{0,0,0},45,{0,1,0});
+    robot1.addJoint(j22,{0,1,0});
+
+    auto j23 = makeJoint(j22,{0.5,0,0},30,{0,1,0});
+    robot1.addJoint(j23,{0,1,0});
 
 
-    auto Jnt11Node = makeRobotJoint(leg1, BodyJntNode, {0.5,0.4,0}, 30, {0,0,1});
+    auto j31 = makeJoint(BodyJntNode,{-0.5,-0.4,0},30,{0,0,1});
+    robot1.addJoint(j31,{0,0,1});
 
-    auto Jnt12Node = makeRobotJoint(leg1, Jnt11Node, {0,0,0}, 45, {0,1,0});
+    auto j32 = makeJoint(j31,{0,0,0},45,{0,1,0});
+    robot1.addJoint(j32,{0,1,0});
 
-    auto Jnt13Node = makeRobotJoint(leg1, Jnt12Node, {0.5,0,0}, 30, {0,1,0});
-*/
-    auto Jnt11Node = makeJoint(BodyJntNode,{0.5,0.4,0},30,{0,0,1});
-    robot1.addJoint(Jnt11Node,{0,0,1});
+    auto j33 = makeJoint(j32,{0.5,0,0},30,{0,1,0});
+    robot1.addJoint(j33,{0,1,0});
 
-    auto Jnt12Node = makeJoint(Jnt11Node,{0,0,0},45,{0,1,0});
-    robot1.addJoint(Jnt12Node,{0,1,0});
+    auto j41 = makeJoint(BodyJntNode,{0.5,-0.4,0},30,{0,0,1});
+    robot1.addJoint(j41,{0,0,1});
 
-    auto Jnt13Node = makeJoint(Jnt12Node,{0.5,0,0},30,{0,1,0});
-    robot1.addJoint(Jnt13Node,{0,1,0});
+    auto j42 = makeJoint(j41,{0,0,0},45,{0,1,0});
+    robot1.addJoint(j42,{0,1,0});
+
+    auto j43 = makeJoint(j42,{0.5,0,0},30,{0,1,0});
+    robot1.addJoint(j43,{0,1,0});
+
 
     //リンク（肉）の設定
     auto GndNode = makeLink(root, &ground, {0,0,0}, {0,0,0});
     GndNode->mode = GL_LINES;
     auto BodyNode = makeLink(BodyJntNode, &body, {0,0,0}, {0,0.5,0});
     BodyNode->mode  = GL_LINES;
-    auto link11Node = makeLink(Jnt12Node, &link, {0.25,0,0}, {0,0.5,0});
-    auto link12Node = makeLink(Jnt13Node, &link, {0.25,0,0}, {0,0,0.5});
-    
-    //legs.push_back(leg1);
+
+    auto link11 = makeLink(j12, &link, {0.25,0,0}, {0,0.5,0});
+    auto link12 = makeLink(j13, &link, {0.25,0,0}, {0,0,0.5});
+
+    auto link21 = makeLink(j22, &link, {0.25,0,0}, {0,0.5,0});
+    auto link22 = makeLink(j23, &link, {0.25,0,0}, {0,0,0.5});
+
+    auto link31 = makeLink(j32, &link, {0.25,0,0}, {0,0.5,0});
+    auto link32 = makeLink(j33, &link, {0.25,0,0}, {0,0,0.5});
+
+    auto link41 = makeLink(j42, &link, {0.25,0,0}, {0,0.5,0});
+    auto link42 = makeLink(j43, &link, {0.25,0,0}, {0,0,0.5});
 
 
 }
@@ -204,22 +233,7 @@ void App::update(float t)
     //関節角を変えるアニメーション関数
     float omega = 2.0f;
 
-    /*for(auto &leg : legs)
-    {
-        for(size_t i=0;i<leg.joints.size();i++)
-        {
-            Joint &j = leg.joints[i];
 
-            j.angle = glm::radians(30.0f) * sin(omega * t);
-
-            glm::mat4 M = j.baseTransform;   // ★初期姿勢
-
-            //M = glm::translate(M, j.pos);
-            M = glm::rotate(M, j.angle, j.axis);
-
-            j.node->transform = M;
-        }
-    }*/
     robot1.state.joint[0] =
     glm::radians(30.0f)*sin(omega*t);
 
