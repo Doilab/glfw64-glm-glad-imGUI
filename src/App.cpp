@@ -12,6 +12,7 @@
 #include "ModelBuilder.h"
 #include "SceneObject.h"
 #include "GUI.h"
+#include "Robot.h"
 
 #ifdef __EMSCRIPTEN__
     #include <emscripten.h>
@@ -22,20 +23,22 @@
 //GUIクラス（ImGUI）
 Gui gui;
 
-App::App()
+
+//--------------------------
+App::App():robot1(3)//初期値設定robot1(3)
 {
 }
 
+//--------------------------
 App::~App()
 {
 }
 
 //---------------------------------------------------
-void loopProxy(void* arg)
+void loopProxy(void* arg)//for Emscripten
 {
     static_cast<App*>(arg)->mainLoop();
 }
-
 //---------------------------------------------------
 int App::run()
 {
@@ -165,7 +168,7 @@ void App::modelling()
 
     auto  BodyJntNode = makeJoint(root, {0.0,0.0,0.5}, 0, {0,0,1});
 
-    Leg leg1;
+/*    Leg leg1;
 
 
     auto Jnt11Node = makeRobotJoint(leg1, BodyJntNode, {0.5,0.4,0}, 30, {0,0,1});
@@ -173,6 +176,15 @@ void App::modelling()
     auto Jnt12Node = makeRobotJoint(leg1, Jnt11Node, {0,0,0}, 45, {0,1,0});
 
     auto Jnt13Node = makeRobotJoint(leg1, Jnt12Node, {0.5,0,0}, 30, {0,1,0});
+*/
+    auto Jnt11Node = makeJoint(BodyJntNode,{0.5,0.4,0},30,{0,0,1});
+    robot1.addJoint(Jnt11Node,{0,0,1});
+
+    auto Jnt12Node = makeJoint(Jnt11Node,{0,0,0},45,{0,1,0});
+    robot1.addJoint(Jnt12Node,{0,1,0});
+
+    auto Jnt13Node = makeJoint(Jnt12Node,{0.5,0,0},30,{0,1,0});
+    robot1.addJoint(Jnt13Node,{0,1,0});
 
     //リンク（肉）の設定
     auto GndNode = makeLink(root, &ground, {0,0,0}, {0,0,0});
@@ -182,7 +194,7 @@ void App::modelling()
     auto link11Node = makeLink(Jnt12Node, &link, {0.25,0,0}, {0,0.5,0});
     auto link12Node = makeLink(Jnt13Node, &link, {0.25,0,0}, {0,0,0.5});
     
-    legs.push_back(leg1);
+    //legs.push_back(leg1);
 
 
 }
@@ -192,7 +204,7 @@ void App::update(float t)
     //関節角を変えるアニメーション関数
     float omega = 2.0f;
 
-    for(auto &leg : legs)
+    /*for(auto &leg : legs)
     {
         for(size_t i=0;i<leg.joints.size();i++)
         {
@@ -207,7 +219,17 @@ void App::update(float t)
 
             j.node->transform = M;
         }
-    }
+    }*/
+    robot1.state.joint[0] =
+    glm::radians(30.0f)*sin(omega*t);
+
+    robot1.state.joint[1] =
+        glm::radians(20.0f)*sin(omega*t);
+
+    robot1.state.joint[2] =
+        glm::radians(10.0f)*sin(omega*t);
+
+    robot1.update();
 }
 
 //----------------------

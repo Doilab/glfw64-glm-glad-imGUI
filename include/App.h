@@ -1,9 +1,12 @@
 #pragma once
+#include "GLHeaders.h"
+#include <GLFW/glfw3.h>
 #include "Renderer.h"
 #include "Camera.h"
 #include "Model.h"
 #include "SceneObject.h"
-#include <GLFW/glfw3.h>
+#include "Robot.h"
+
 struct Joint
 {
     std::shared_ptr<SceneObject> node;
@@ -32,6 +35,8 @@ private:
     Model cube, cyl, link, body;
     Model axis3, xAxis, yAxis, zAxis;
     Model ground;
+
+    Robot robot1;//ロボットクラス
 
     std::shared_ptr<SceneObject> root;
 

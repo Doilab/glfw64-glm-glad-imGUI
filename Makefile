@@ -2,7 +2,7 @@ CC=g++
 CC_MINGW64VSC =..\TOOLS\mingw64\bin\g++
 
 APP_SRC = ./src/App.cpp ./src/Renderer.cpp ./src/main.cpp ./src/Camera.cpp \
-	./src/Model.cpp ./src/ModelBuilder.cpp ./src/SceneObject.cpp ./src/GUI.cpp
+	./src/Model.cpp ./src/ModelBuilder.cpp ./src/SceneObject.cpp ./src/GUI.cpp ./src/Robot.cpp
 IMGUI_SRC = imGUI/imgui/imgui.cpp imGUI/imgui/imgui_draw.cpp imGUI/imgui/imgui_widgets.cpp imGUI/imgui/imgui_tables.cpp \
     imGUI/imgui/backends/imgui_impl_glfw.cpp imGUI/imgui/backends/imgui_impl_opengl3.cpp 
 IMGUI_SRC_WEB = imGUI/imgui/imgui.cpp imGUI/imgui/imgui_draw.cpp imGUI/imgui/imgui_widgets.cpp imGUI/imgui/imgui_tables.cpp \
