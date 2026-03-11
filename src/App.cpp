@@ -6,21 +6,21 @@
 #include <iostream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include "imGUI/imgui.h"
-#include "imGUI/imgui_impl_glfw.h"
-#include "imGUI/imgui_impl_opengl3.h"
+
 
 #include "Renderer.h"
 #include "ModelBuilder.h"
 #include "SceneObject.h"
+#include "GUI.h"
 
 #ifdef __EMSCRIPTEN__
     #include <emscripten.h>
 #endif
 
-// ImGUI用の変数初期化
-float imgui_x = 0.0f, imgui_y = 0.0f;
-float now_second = 0;
+
+
+//GUIクラス（ImGUI）
+Gui gui;
 
 App::App()
 {
@@ -55,89 +55,7 @@ int App::run()
 }
 
 //---------------------------------------------------
-void imgui_setup(GLFWwindow* window)
-{
-    // Setup Dear ImGui context
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    int w, h;
-    glfwGetFramebufferSize(window, &w, &h);
 
-    ImGuiIO& io = ImGui::GetIO();
-    io.DisplaySize = ImVec2((float)w, (float)h);
-    io.DisplayFramebufferScale = ImVec2(1.0f,1.0f);
-
-    #ifndef __EMSCRIPTEN__
-        //io.Fonts->AddFontFromFileTTF("ipag.ttf",32.0f,NULL,io.Fonts->GetGlyphRangesDefault());
-        io.Fonts->AddFontFromFileTTF("ipag.ttf",32.0f,NULL,io.Fonts->GetGlyphRangesJapanese());
-        //io.FontGlobalScale = 5;//スケール大きく
-    #else
-        //日本語フォント↓260308スマホで成功
-        io.Fonts->AddFontFromFileTTF("/ipag.ttf",32.0f,NULL,io.Fonts->GetGlyphRangesJapanese());//em++用
-        // Webはフォントロード失敗しやすいので
-        // デフォルトフォントを使う場合↓
-        //io.Fonts->AddFontDefault();
-    #endif
-
-    // Setup Dear ImGui style
-    //ImGui::StyleColorsDark();
-    //ImGui::StyleColorsClassic();
-
-    // Setup Platform/Renderer bindings
-    #ifdef __EMSCRIPTEN__
-        ImGui_ImplOpenGL3_Init("#version 300 es");//for emcc web用
-    #else
-        ImGui_ImplGlfw_InitForOpenGL(window, true);
-        const char* glsl_version = "#version 130";
-        ImGui_ImplOpenGL3_Init(glsl_version);//PC用
-    #endif
-}
-//----------------------
-void imgui_begin(GLFWwindow* window)
-{
-    int w,h;
-    glfwGetFramebufferSize(window,&w,&h);
-
-    ImGuiIO& io = ImGui::GetIO();
-
-    io.DisplaySize = ImVec2((float)w,(float)h);
-    io.DeltaTime = 1.0f/60.0f;
-
-    double mx,my;
-    glfwGetCursorPos(window,&mx,&my);
-
-    io.MousePos = ImVec2((float)mx,(float)my);
-
-    io.MouseDown[0] =
-        glfwGetMouseButton(window,GLFW_MOUSE_BUTTON_LEFT)==GLFW_PRESS;
-
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui::NewFrame();
-
-    
-    ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(300, 100), ImGuiCond_FirstUseEver);
-
-}
-
-//----------------------
-void imgui_draw()
-{
-    // ImGUI描画内容セット
-    ImGui::Begin(u8"update 260310");
-    //ImGui::Text("日本語. %d", 123);
-    ImGui::Text("経過時間. %.5f", now_second);
-    ImGui::DragFloat("x", &imgui_x);
-    ImGui::DragFloat("y", &imgui_y);
-    ImGui::End();
- 
-}
-//----------------------
-void imgui_end()
-{
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-}
 //----------------------
 void App::AttachAxis(std::shared_ptr<SceneObject> obj)
 {
@@ -337,7 +255,7 @@ bool App::init()
     modelling();
     
     //imGUIの初期設定
-    imgui_setup(window);
+    gui.setup(window);
     
     return true;
 }
@@ -348,9 +266,9 @@ void App::mainLoop()
     glfwPollEvents();
 
     //ImGUI初期化と入力読み取り
-    imgui_begin(window);
+    gui.begin(window);
     //ImGUIの描画準備
-    imgui_draw();
+    gui.draw();
  
 
     // 画面クリア
@@ -376,7 +294,7 @@ void App::mainLoop()
     }
     
     float time = glfwGetTime();
-    now_second = (time);
+    gui.now_second = (time);
     float currentFrame = time;
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
@@ -407,34 +325,29 @@ void App::mainLoop()
     glPolygonOffset(1.0, 1.0);
 
     renderer.draw(cube, model1, glm::vec3(0.8,0.0,0.0), GL_TRIANGLES);
-    //renderer.draw(cyl, model2, glm::vec3(0.0,0.8,0.0), GL_TRIANGLES);
 
     glDisable(GL_POLYGON_OFFSET_FILL);
 
     // エッジ
-    //glDisable(GL_DEPTH_TEST);
     glLineWidth(2.0f);
     renderer.drawEdges(cube,model1,glm::vec3(0.0,0.0,0.0));
-    //renderer.drawEdges(cyl,model2,glm::vec3(0.0,0.0,0.0));
-    //glEnable(GL_DEPTH_TEST);
 
 
     // Axis
     glLineWidth(3.0f);
-//    renderer.draw(axis, model1, glm::vec3(0,1,0), GL_LINES);
     renderer.draw(xAxis, model1, glm::vec3(1,0,0), GL_LINES);
     renderer.draw(yAxis, model1, glm::vec3(0,1,0), GL_LINES);
     renderer.draw(zAxis, model1, glm::vec3(0,0,1), GL_LINES);
     
 
-    update(time);//モデリングレベルでのアニメーション
+    update(time);//関節角レベルでのアニメーション
 
-    //SceneObject描画
+    //SceneObject（階層構造あり）描画
     root->draw(renderer, model2);
 
     // ImGUI描画（必ず最後）
     glDisable(GL_DEPTH_TEST);
-        imgui_end();
+        gui.end();
     glEnable(GL_DEPTH_TEST);
     
     glfwSwapBuffers(window);
@@ -443,17 +356,10 @@ void App::mainLoop()
 void App::shutdown()
 {
     cube.cleanup();
+    xAxis.cleanup();
+    yAxis.cleanup();
+    zAxis.cleanup();
 
-    ImGui_ImplOpenGL3_Shutdown();
-    #ifdef __EMSCRIPTEN__
-    ImGui_ImplGlfw_Shutdown();
-    #endif
-    ImGui::DestroyContext();
-
-    if (window)
-    {
-        glfwDestroyWindow(window);
-        window = nullptr;
-    }
+    gui.shutdown();
 	glfwTerminate();
 }
