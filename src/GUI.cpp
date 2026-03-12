@@ -86,7 +86,7 @@ void Gui::begin(GLFWwindow* window)
 
 void Gui::draw()
 {
-    ImGui::Begin(u8"update 260311");
+    ImGui::Begin(u8"update 260312");
 
     ImGui::Text("経過時間 %.2f", now_second);
 

@@ -7,9 +7,9 @@ Camera::Camera()
 
     target = glm::vec3(0.0f, 0.0f, 0.0f);
 
-    azimuth   = 150.0f;  // 斜め後ろ
+    azimuth   = 120.0f;  // 斜め後ろ
     elevation = 30.0f;   // 見下ろし
-    distance  = 5.0f;
+    distance  = 4.0f;
 
     movementSpeed   = 5.0f;
     mouseSensitivity = 0.1f;
@@ -95,7 +95,7 @@ void Camera::processMouse(double xpos, double ypos, bool pressed)
     dx *= mouseSensitivity;
     dy *= mouseSensitivity;
 
-    azimuth   += dx;
+    azimuth   -= dx;
     elevation += dy;
 
     elevation = glm::clamp(elevation, -89.0f, 89.0f);
