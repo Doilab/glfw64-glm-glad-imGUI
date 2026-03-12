@@ -338,9 +338,9 @@ void App::mainLoop()
     //アニメーションのためのモデル行列
     glm::mat4 model1 = glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f,0.0f,0.0f));
     model1 = glm::rotate(model1, (time*0.5f), glm::vec3(1,1,0));
-    model1 = glm::scale(model1,glm::vec3(0.2,0.2,0.2));
+    model1 = glm::scale(model1,glm::vec3(0.3,0.3,0.3));
     glm::mat4 model2 = glm::translate(glm::mat4(1.0f), glm::vec3(1.0f,0.0f,0.0f));
-    model2 = glm::rotate(model2, time*0.5f, glm::vec3(1,1,0));
+    model2 = glm::rotate(model2, time*0.0f, glm::vec3(1,1,0));
     
 
     // 毎フレームカメラ更新

@@ -3,13 +3,13 @@
 
 Camera::Camera()
 {
-    position = glm::vec3(0.0f, 0.0f, 5.0f);
-    worldUp  = glm::vec3(0.0f, 1.0f, 0.0f);
+    worldUp = glm::vec3(0.0f, 0.0f, 1.0f);
 
-    yaw   = -90.0f;
-    pitch = 0.0f;
+    target = glm::vec3(0.0f, 0.0f, 0.0f);
 
-    front = glm::vec3(0.0f, 0.0f, -1.0f);
+    azimuth   = 150.0f;  // 斜め後ろ
+    elevation = 30.0f;   // 見下ろし
+    distance  = 5.0f;
 
     movementSpeed   = 5.0f;
     mouseSensitivity = 0.1f;
@@ -21,80 +21,104 @@ Camera::Camera()
     updateVectors();
 }
 //-----------------------------
-void Camera::processKeyboard(GLFWwindow* window, float deltaTime)
+
+ void Camera::processKeyboard(GLFWwindow* window, float dt)
 {
-    float velocity = movementSpeed * deltaTime;
+    float rotSpeed  = 60.0f * dt;
+    float zoomSpeed = 5.0f  * dt;
+    float panSpeed  = 2.0f  * dt;
 
-    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-        yaw -= 60.0f * deltaTime;
+    bool shift = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS;
 
-    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-        yaw += 60.0f * deltaTime;
+    if(!shift)
+    {
+        if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+            azimuth -= rotSpeed;
 
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-        pitch += 60.0f * deltaTime;
+        if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+            azimuth += rotSpeed;
 
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-        pitch -= 60.0f * deltaTime;
+        if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+            elevation += rotSpeed;
 
-    if (glfwGetKey(window, GLFW_KEY_PAGE_UP) == GLFW_PRESS)
-        position += front * velocity;
+        if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+            elevation -= rotSpeed;
 
-    if (glfwGetKey(window, GLFW_KEY_PAGE_DOWN) == GLFW_PRESS)
-        position -= front * velocity;
+        if (glfwGetKey(window, GLFW_KEY_PAGE_UP) == GLFW_PRESS)
+            distance -= zoomSpeed;
 
-    if (pitch > 89.0f)  pitch = 89.0f;
-    if (pitch < -89.0f) pitch = -89.0f;
+        if (glfwGetKey(window, GLFW_KEY_PAGE_DOWN) == GLFW_PRESS)
+            distance += zoomSpeed;
+    }
+    else
+    {
+        if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+            target -= right * panSpeed;
+
+        if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+            target += right * panSpeed;
+
+        if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+            target += up * panSpeed;
+
+        if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+            target -= up * panSpeed;
+    }
+
+    elevation = glm::clamp(elevation, -89.0f, 89.0f);
+    distance  = glm::max(distance, 0.5f);
 
     updateVectors();
 }
 //-----------------------------
-void Camera::processMouse(double xpos, double ypos, bool mousePressed)
+void Camera::processMouse(double xpos, double ypos, bool pressed)
 {
-    if (!mousePressed)
+    if(!pressed)
     {
         firstMouse = true;
         return;
     }
 
-    if (firstMouse)
+    if(firstMouse)
     {
         lastX = xpos;
         lastY = ypos;
         firstMouse = false;
     }
 
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos;
+    float dx = xpos - lastX;
+    float dy = ypos - lastY;
 
     lastX = xpos;
     lastY = ypos;
 
-    xoffset *= mouseSensitivity;
-    yoffset *= mouseSensitivity;
+    dx *= mouseSensitivity;
+    dy *= mouseSensitivity;
 
-    yaw   += xoffset;
-    pitch += yoffset;
+    azimuth   += dx;
+    elevation += dy;
 
-    if (pitch > 89.0f)  pitch = 89.0f;
-    if (pitch < -89.0f) pitch = -89.0f;
+    elevation = glm::clamp(elevation, -89.0f, 89.0f);
 
     updateVectors();
 }
 //-----------------------------
 void Camera::updateVectors()
 {
-    glm::vec3 f;
-    f.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-    f.y = sin(glm::radians(pitch));
-    f.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    float a = glm::radians(azimuth);
+    float e = glm::radians(elevation);
 
-    front = glm::normalize(f);
+    position.x = target.x + distance * cos(e) * cos(a);
+    position.y = target.y + distance * cos(e) * sin(a);
+    position.z = target.z + distance * sin(e);
+
+    front = glm::normalize(target - position);
     right = glm::normalize(glm::cross(front, worldUp));
     up    = glm::normalize(glm::cross(right, front));
 }
 //-----------------------------
 glm::mat4 Camera::getViewMatrix() const
 {
-    return glm::lookAt(position, position + front, up);
+    //return glm::lookAt(position, position + front, up);
+    return glm::lookAt(position, target, up);
 }
