@@ -33,10 +33,10 @@ Camera::Camera()
     if(!shift)
     {
         if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-            azimuth -= rotSpeed;
+            azimuth += rotSpeed;
 
         if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-            azimuth += rotSpeed;
+            azimuth -= rotSpeed;
 
         if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
             elevation += rotSpeed;
@@ -53,10 +53,10 @@ Camera::Camera()
     else
     {
         if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-            target -= right * panSpeed;
+            target += right * panSpeed;
 
         if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-            target += right * panSpeed;
+            target -= right * panSpeed;
 
         if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
             target += up * panSpeed;

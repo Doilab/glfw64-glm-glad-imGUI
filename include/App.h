@@ -32,7 +32,8 @@ public:
 
 private:
     Renderer renderer;
-    Model cube, cyl, link, body;
+    Model cube, cyl;
+    Model link1, link2, body;
     Model axis3, xAxis, yAxis, zAxis;
     Model ground;
 
