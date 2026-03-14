@@ -1,3 +1,4 @@
+#	--preload-file ipag.ttf 
 CC=g++
 CC_MINGW64VSC =..\TOOLS\mingw64\bin\g++
 
@@ -40,7 +41,7 @@ linux-web:
 	-s INITIAL_MEMORY=134217728 \
 	-s ALLOW_MEMORY_GROWTH=1 \
 	-fexceptions \
-	--preload-file ipag.ttf \
+	--preload-file assets \
 	--preload-file shaders \
 	-Wno-nontrivial-memcall \
 	-O2 \

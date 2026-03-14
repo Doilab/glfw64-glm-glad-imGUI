@@ -352,7 +352,7 @@ void App::mainLoop()
     model1 = glm::rotate(model1, (time*0.5f), glm::vec3(1,1,0));//固定軸周りのアニメーション
     model1 = glm::scale(model1,glm::vec3(0.01,0.01,0.01));
 
-    glm::mat4 model2 = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f,0.0f,0.0f));
+    glm::mat4 model2 = glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f,0.0f,0.0f));
     //model2 = glm::rotate(model2, time*0.0f, glm::vec3(1,1,0));//固定軸周りのアニメーション
     model2 = glm::scale(model2,glm::vec3(0.01,0.01,0.01));
     

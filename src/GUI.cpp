@@ -32,7 +32,7 @@ void Gui::setup(GLFWwindow* window)
     #ifndef __EMSCRIPTEN__
 
         io.Fonts->AddFontFromFileTTF(
-            "ipag.ttf",
+            "/assets/ipag.ttf",
             32.0f,
             NULL,
             io.Fonts->GetGlyphRangesJapanese()
@@ -41,7 +41,7 @@ void Gui::setup(GLFWwindow* window)
     #else
 
         io.Fonts->AddFontFromFileTTF(
-            "/ipag.ttf",
+            "./assets/ipag.ttf",
             32.0f,
             NULL,
             io.Fonts->GetGlyphRangesJapanese()
@@ -80,19 +80,42 @@ void Gui::begin(GLFWwindow* window)
         glfwGetMouseButton(window,GLFW_MOUSE_BUTTON_LEFT)==GLFW_PRESS;
 
 
-    ImGui::SetNextWindowPos(ImVec2(10,10),ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(300,100),ImGuiCond_FirstUseEver);
+
 }
 
 void Gui::draw()
 {
-    ImGui::Begin(u8"update 260312");
+    ImGui::SetNextWindowPos(ImVec2(10,10),ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(300,220),ImGuiCond_FirstUseEver);
+    ImGui::Begin(u8"W1 update260314");
 
-    ImGui::Text("経過時間 %.2f", now_second);
+        ImGui::Text("経過時間 %.2f", now_second);
 
-    ImGui::DragFloat("x",&imgui_x);
-    ImGui::DragFloat("y",&imgui_y);
+        if(ImGui::Button("Up")) joy[1]+=0.1;
+        ImGui::SameLine();
 
+        if(ImGui::Button("<")) joy[0]-=0.1;
+        ImGui::SameLine();
+
+        if(ImGui::Button(">")) joy[0]+=0.1;
+        ImGui::SameLine();
+
+        if(ImGui::Button("Dn")) joy[1]-=0.1;
+
+        ImGui::SliderFloat2("JS", joy, -1.0f, 1.0f);
+
+    ImGui::End();
+
+    ImGui::SetNextWindowPos(ImVec2(10,250),ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(300,320),ImGuiCond_FirstUseEver);
+    ImGui::Begin(u8"W2 ---");
+        for(int i=0;i<4;i++)
+        {
+            std::string label = "Leg" + std::to_string(i+1);
+            ImGui::SliderFloat3(label.c_str(), &joint[i].x, -3.14f, 3.14f);
+        }
+        ImGui::DragFloat("x",&imgui_x);
+        ImGui::DragFloat("y",&imgui_y);
     ImGui::End();
 }
 

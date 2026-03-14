@@ -9,7 +9,7 @@ Camera::Camera()
 
     azimuth   = 120.0f;  // 斜め後ろ
     elevation = 30.0f;   // 見下ろし
-    distance  = 4.0f;
+    distance  = 5.0f;
 
     movementSpeed   = 5.0f;
     mouseSensitivity = 0.1f;
