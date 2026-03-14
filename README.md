@@ -104,17 +104,9 @@ make win64
 
 ## Future improvements
 
-Camera system
-
-STL loader
-
-JSON support
-
-WebSocket
-
-License
-
-MIT License
+- JSON support
+- WebSocket
+- Menu
 
 
 ---
