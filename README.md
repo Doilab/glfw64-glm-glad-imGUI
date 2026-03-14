@@ -60,6 +60,12 @@ glad/
 glm/
 GLFW/
 
+assets
+fonts, STL files
+
+
+docs/
+HTML files
 
 
 ---
@@ -86,10 +92,11 @@ make win64
 
 ## Dependencies
 
-- GLFW (window / input)
-- GLAD (OpenGL loader)
-- GLM (math library)
-- Dear ImGui (debug UI)
+- GLFW (window / input) https://www.glfw.org/
+- GLAD (OpenGL loader) https://glad.dav1d.de/
+- GLM (math library) https://github.com/g-truc/glm
+- Dear ImGui (debug UI) https://github.com/ocornut/imgui
+- Emscripten compiler https://emscripten.org/
 
 ---
 
