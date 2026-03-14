@@ -3,6 +3,7 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include <string>
 
 void Gui::setup(GLFWwindow* window)
 {
@@ -29,26 +30,18 @@ void Gui::setup(GLFWwindow* window)
 
     #endif
 
-    #ifndef __EMSCRIPTEN__
-
-        io.Fonts->AddFontFromFileTTF(
-            "/assets/ipag.ttf",
-            32.0f,
-            NULL,
-            io.Fonts->GetGlyphRangesJapanese()
-        );
-
+    #ifdef __EMSCRIPTEN__
+    const char* fontPath = "assets/ipag.ttf";
     #else
-
-        io.Fonts->AddFontFromFileTTF(
-            "./assets/ipag.ttf",
-            32.0f,
-            NULL,
-            io.Fonts->GetGlyphRangesJapanese()
-        );
-
+    const char* fontPath = "assets/ipag.ttf";
     #endif
 
+    io.Fonts->AddFontFromFileTTF(
+        fontPath,
+        32.0f,
+        NULL,
+        io.Fonts->GetGlyphRangesJapanese()
+    );
 
 }
 

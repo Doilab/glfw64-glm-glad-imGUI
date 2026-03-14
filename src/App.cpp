@@ -169,7 +169,8 @@ void App::modelling()
     float link2_len=50;
     float height=50;//初期胴体高さ
     link1 = ModelBuilder::createBox(link1_len,5.0f,10.0f);
-    link2 = ModelBuilder::createBox(link2_len,5.0f,10.0f);
+    //link2 = ModelBuilder::createBox(link2_len,5.0f,10.0f);
+    link2 = ModelBuilder::loadSTL("assets/link02.stl",1.0);
     body = ModelBuilder::createBox(base_x*2,base_y*2,10.0f);
 
     root = std::make_shared<SceneObject>();
@@ -226,16 +227,16 @@ void App::modelling()
     BodyNode->mode  = GL_LINES;
 
     auto link11 = makeLink(j12, &link1, {link1_len*0.5,0,0}, {0,0.5,0});
-    auto link12 = makeLink(j13, &link2, {link2_len*0.5,0,0}, {0,0,0.5});
+    auto link12 = makeLink(j13, &link2, {0,0,0}, {0,0,0.5});
 
     auto link21 = makeLink(j22, &link1, {link1_len*0.5,0,0}, {0,0.5,0});
-    auto link22 = makeLink(j23, &link2, {link2_len*0.5,0,0}, {0,0,0.5});
+    auto link22 = makeLink(j23, &link2, {0,0,0}, {0,0,0.5});
 
     auto link31 = makeLink(j32, &link1, {link1_len*0.5,0,0}, {0,0.5,0});
-    auto link32 = makeLink(j33, &link2, {link2_len*0.5,0,0}, {0,0,0.5});
+    auto link32 = makeLink(j33, &link2, {0,0,0}, {0,0,0.5});
 
     auto link41 = makeLink(j42, &link1, {link1_len*0.5,0,0}, {0,0.5,0});
-    auto link42 = makeLink(j43, &link2, {link2_len*0.5,0,0}, {0,0,0.5});
+    auto link42 = makeLink(j43, &link2, {0,0,0}, {0,0,0.5});
 
 
 }

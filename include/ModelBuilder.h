@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Model.h"
+#include <string>
 
 class ModelBuilder
 {
@@ -18,5 +19,12 @@ public:
     static Model createSphere(float radius, int stacks, int slices);
 
     static void buildEdges(Model& model);
+
+    static Model loadSTL(const std::string& filename, float scale);
+
+    static Model build(
+        const std::vector<float>& vertices,
+        const std::vector<float>& normals);
+
 
 };

@@ -2,6 +2,11 @@
 #include <set>
 #include <utility>
 #include <math.h>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <cstdint>
+#include <iostream>
 
 Model ModelBuilder::createCube(float s)
 {
@@ -223,4 +228,65 @@ int seg = segments;
     buildEdges(m);
     m.upload();
     return m;
+}
+
+Model ModelBuilder::loadSTL(const std::string& filename, float scale)
+{
+    Model model;
+
+    std::ifstream file(filename, std::ios::binary);
+    if(!file)
+    {
+        std::cerr << "STL load failed: " << filename << '\n';
+        return model;
+    }
+
+    // ----- header -----
+    char header[80];
+    file.read(header,80);
+
+    uint32_t triCount;
+    file.read(reinterpret_cast<char*>(&triCount),4);
+
+    // ----- triangles -----
+    for(uint32_t i=0;i<triCount;i++)
+    {
+        float normal[3];
+        float v[9];
+        uint16_t attr;
+
+        file.read(reinterpret_cast<char*>(normal),12);
+        file.read(reinterpret_cast<char*>(v),36);
+        file.read(reinterpret_cast<char*>(&attr),2);
+
+        unsigned int base = model.vertices.size()/3;
+
+        // v1
+        model.vertices.push_back(v[0]*scale);
+        model.vertices.push_back(v[1]*scale);
+        model.vertices.push_back(v[2]*scale);
+
+        // v2
+        model.vertices.push_back(v[3]*scale);
+        model.vertices.push_back(v[4]*scale);
+        model.vertices.push_back(v[5]*scale);
+
+        // v3
+        model.vertices.push_back(v[6]*scale);
+        model.vertices.push_back(v[7]*scale);
+        model.vertices.push_back(v[8]*scale);
+
+        // triangle indices
+        model.indices.push_back(base);
+        model.indices.push_back(base+1);
+        model.indices.push_back(base+2);
+    }
+
+    // ----- edges -----
+    buildEdges(model);
+
+    // ----- GPU upload -----
+    model.upload();
+
+    return model;
 }
