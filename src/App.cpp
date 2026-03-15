@@ -317,7 +317,7 @@ void App::mainLoop()
     //ImGUI初期化と入力読み取り
     gui.begin(window);
     //ImGUIの描画準備
-    gui.draw();
+    gui.draw(&(robot1.state));
  
 
     // 画面クリア
@@ -359,14 +359,16 @@ void App::mainLoop()
     
 
     // 毎フレームカメラ更新
-    camera.processKeyboard(window, deltaTime);
-    double mouseX, mouseY;
-    glfwGetCursorPos(window, &mouseX, &mouseY);
-    bool pressed =
-        glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
-    camera.processMouse(mouseX, mouseY, pressed);
-    renderer.setViewMatrix(camera.getViewMatrix());
-   
+    if(!gui.WantCaptureMouse())
+    {
+        camera.processKeyboard(window, deltaTime);
+        double mouseX, mouseY;
+        glfwGetCursorPos(window, &mouseX, &mouseY);
+        bool pressed =
+            glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
+        camera.processMouse(mouseX, mouseY, pressed);
+        renderer.setViewMatrix(camera.getViewMatrix());
+    }
 
 
     // 回転する立方体描画

@@ -38,7 +38,7 @@ void Gui::setup(GLFWwindow* window)
 
     io.Fonts->AddFontFromFileTTF(
         fontPath,
-        32.0f,
+        16.0f,
         NULL,
         io.Fonts->GetGlyphRangesJapanese()
     );
@@ -76,37 +76,42 @@ void Gui::begin(GLFWwindow* window)
 
 }
 
-void Gui::draw()
+void Gui::draw(RobotState* rs)
 {
-    ImGui::SetNextWindowPos(ImVec2(10,10),ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(300,220),ImGuiCond_FirstUseEver);
-    ImGui::Begin(u8"W1 update260314");
+    ImGui::SetNextWindowPos(ImVec2(0,0),ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(200,100),ImGuiCond_FirstUseEver);
+    ImGui::Begin(u8"W1 update260315");
 
         ImGui::Text("経過時間 %.2f", now_second);
-
-        if(ImGui::Button("Up")) joy[1]+=0.1;
-        ImGui::SameLine();
 
         if(ImGui::Button("<")) joy[0]-=0.1;
         ImGui::SameLine();
 
-        if(ImGui::Button(">")) joy[0]+=0.1;
+        if(ImGui::Button("Up")) joy[1]+=0.1;
         ImGui::SameLine();
 
         if(ImGui::Button("Dn")) joy[1]-=0.1;
+        ImGui::SameLine();
+
+        if(ImGui::Button(">")) joy[0]+=0.1;
 
         ImGui::SliderFloat2("JS", joy, -1.0f, 1.0f);
 
     ImGui::End();
 
-    ImGui::SetNextWindowPos(ImVec2(10,250),ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(300,320),ImGuiCond_FirstUseEver);
-    ImGui::Begin(u8"W2 ---");
-        for(int i=0;i<4;i++)
+    ImGui::SetNextWindowPos(ImVec2(0,110),ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(200,350),ImGuiCond_FirstUseEver);
+    ImGui::Begin(u8"W2 Joints");
+/*         for(int i=0;i<4;i++)
         {
             std::string label = "Leg" + std::to_string(i+1);
             ImGui::SliderFloat3(label.c_str(), &joint[i].x, -3.14f, 3.14f);
-        }
+        } */
+         for(int i=0;i<rs->joint.size();i++)
+         {
+            std::string label = "J" + std::to_string(i+1);
+            ImGui::SliderFloat(label.c_str(), &(rs->joint[i]), -3.14f, 3.14f);  
+         }
         ImGui::DragFloat("x",&imgui_x);
         ImGui::DragFloat("y",&imgui_y);
     ImGui::End();
@@ -125,4 +130,11 @@ void Gui::shutdown()
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui::DestroyContext();
+}
+
+bool Gui::WantCaptureMouse()
+{
+    bool flag;
+    flag = ImGui::GetIO().WantCaptureMouse;
+    return flag;
 }

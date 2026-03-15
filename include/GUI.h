@@ -10,9 +10,10 @@ public:
 
     void setup(GLFWwindow* window);
     void begin(GLFWwindow* window);
-    void draw();
+    void draw(RobotState* rs);
     void end();
     void shutdown();
+    bool WantCaptureMouse();
 
     // GUI用パラメータ
     float imgui_x = 0.0f;

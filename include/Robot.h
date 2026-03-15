@@ -35,7 +35,7 @@ public:
 
     std::vector<RobotJoint> joints;
 
-    Robot(int jointNum = 6)
+    Robot(int jointNum = 12)
     {
         state.joint.resize(jointNum,0.0f);
     }
