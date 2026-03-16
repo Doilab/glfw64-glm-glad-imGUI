@@ -45,14 +45,9 @@ localhost:8080
 ## Project Structure
 
 src/
-App.cpp
-Camera.cpp
-GUI.cpp
-Model.cpp
-ModelBuilder.cpp
-Renderer.cpp
-Robot.h
-SceneObject.cpp
+
+include/
+nlohmann/json
 
 third_party/
 imgui/
@@ -60,7 +55,7 @@ glad/
 glm/
 GLFW/
 
-assets
+assets/
 fonts, STL files
 
 
@@ -97,6 +92,7 @@ make win64
 - GLM (math library) https://github.com/g-truc/glm
 - Dear ImGui (debug UI) https://github.com/ocornut/imgui
 - Emscripten compiler https://emscripten.org/
+- nlohmann JSON https://github.com/nlohmann/json
 
 ---
 
