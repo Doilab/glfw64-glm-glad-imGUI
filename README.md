@@ -1,4 +1,4 @@
-# OpenGL GLFW + GLAD + GLM + Dear ImGui Template
+# OpenGL GLFW + GLAD + GLM + Dear ImGui + IXWebSocket Template
 A minimal OpenGL starter project using:
 # モダンOpenGLのテスト
 2026.3.1 -
@@ -15,6 +15,7 @@ This project provides a simple structure for experimenting with OpenGL rendering
 - Dear ImGui debug UI
 - Simple Model / Renderer structure
 - Edge rendering for mesh visualization
+- IXWebSocket interface
 
 ---
 
@@ -82,7 +83,10 @@ make linux
 
 make win64
 
-(WebSocketあたりから未確認)
+### Linux websocket server (g++)
+
+
+make websocket-test
 
 ---
 
@@ -103,7 +107,8 @@ make win64
 
 ## Future improvements
 
-- WebSocket
+- WebSocket test
+- Animation
 - Menu
 
 
