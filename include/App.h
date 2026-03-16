@@ -36,6 +36,7 @@ private:
     Model link1, link2, body;
     Model axis3, xAxis, yAxis, zAxis;
     Model ground;
+    Model arrow;
 
     Robot robot1;//ロボットクラス
 

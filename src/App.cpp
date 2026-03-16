@@ -155,28 +155,37 @@ void App::modelling()
 {
     //モデリング処理．事前に生成しておく．
     axis3 = ModelBuilder::create3Axis(2);
-    xAxis = ModelBuilder::createXAxis(20.0);
-    yAxis = ModelBuilder::createYAxis(20.0);
-    zAxis = ModelBuilder::createZAxis(20.0);
-    cube = ModelBuilder::createCube(5.0);
+    xAxis = ModelBuilder::createXAxis(0.02);
+    yAxis = ModelBuilder::createYAxis(0.02);
+    zAxis = ModelBuilder::createZAxis(0.02);
+    cube = ModelBuilder::createCube(0.015f);
     cyl = ModelBuilder::createCylinder(0.5f,0.5f,8);
-    ground = ModelBuilder::createBox(200.0f,200.0f,1.0f);
+    ground = ModelBuilder::createBox(0.2f,0.2f,0.01f);
+    arrow = ModelBuilder::loadSTL("assets/arrow.stl",0.0005);
 
     //ジョイント（骨）設定
-    float base_x=50;//脚付け根 x
-    float base_y=30;//脚付け根 y
-    float link1_len=50;
-    float link2_len=50;
-    float height=50;//初期胴体高さ
-    link1 = ModelBuilder::createBox(link1_len,5.0f,10.0f);
+    float base_x=0.050;//脚付け根 x
+    float base_y=0.030;//脚付け根 y
+    float link1_len=0.050;
+    float link2_len=0.050;
+    float height=0.050;//初期胴体高さ
+    //link1 = ModelBuilder::createBox(link1_len,5.0f,10.0f);
+    link1 = ModelBuilder::loadSTL("assets/link02.stl",0.001);
     //link2 = ModelBuilder::createBox(link2_len,5.0f,10.0f);
-    link2 = ModelBuilder::loadSTL("assets/link02.stl",1.0);
-    body = ModelBuilder::createBox(base_x*2,base_y*2,10.0f);
+    link2 = ModelBuilder::loadSTL("assets/link02.stl",0.001);
+    body = ModelBuilder::createBox(base_x*2,base_y*2,0.010f);
 
     root = std::make_shared<SceneObject>();
 
 
     auto  BodyJntNode = makeJoint(root, {0.0,0.0,height}, 0, {0,0,1});
+    auto BodyArrowNode = makeLink(BodyJntNode, &arrow, {0.05,0,0.0}, {0.8,0.2,0});//胴体の向き矢印
+    auto M = BodyArrowNode->transform;
+    M = glm::rotate(M, glm::radians(90.0f), glm::vec3(1,0,0));//矢印の向き調整
+    M = glm::rotate(M, glm::radians(180.0f), glm::vec3(0,0,1));//矢印の向き調整
+    float arrow_theta = 10.0f;//矢印の傾き
+    M = glm::rotate(M, glm::radians(arrow_theta), glm::vec3(0,1,0));//矢印の向き調整
+    BodyArrowNode->transform = M;
 
     auto j10 = makeJoint(BodyJntNode,{base_x,base_y,0},90,{0,0,1});//付け根ダミージョイント
     auto j11 = makeJoint(j10,{0.0,0.0,0},-30,{0,0,1});
@@ -226,16 +235,20 @@ void App::modelling()
     auto BodyNode = makeLink(BodyJntNode, &body, {0,0,0}, {0,0.5,0});
     BodyNode->mode  = GL_LINES;
 
-    auto link11 = makeLink(j12, &link1, {link1_len*0.5,0,0}, {0,0.5,0});
+    //auto link11 = makeLink(j12, &link1, {link1_len*0.5,0,0}, {0,0.5,0});
+    auto link11 = makeLink(j12, &link2, {0,0,0}, {0,0.5,0});
     auto link12 = makeLink(j13, &link2, {0,0,0}, {0,0,0.5});
 
-    auto link21 = makeLink(j22, &link1, {link1_len*0.5,0,0}, {0,0.5,0});
+    //auto link21 = makeLink(j22, &link1, {link1_len*0.5,0,0}, {0,0.5,0});
+    auto link21 = makeLink(j22, &link2, {0,0,0}, {0,0.5,0});
     auto link22 = makeLink(j23, &link2, {0,0,0}, {0,0,0.5});
 
-    auto link31 = makeLink(j32, &link1, {link1_len*0.5,0,0}, {0,0.5,0});
+    //auto link31 = makeLink(j32, &link1, {link1_len*0.5,0,0}, {0,0.5,0});
+    auto link31 = makeLink(j32, &link2, {0,0,0}, {0,0.5,0});
     auto link32 = makeLink(j33, &link2, {0,0,0}, {0,0,0.5});
 
-    auto link41 = makeLink(j42, &link1, {link1_len*0.5,0,0}, {0,0.5,0});
+    //auto link41 = makeLink(j42, &link1, {link1_len*0.5,0,0}, {0,0.5,0});
+    auto link41 = makeLink(j42, &link2, {0,0,0}, {0,0.5,0});
     auto link42 = makeLink(j43, &link2, {0,0,0}, {0,0,0.5});
 
 
@@ -351,11 +364,11 @@ void App::mainLoop()
     //物体配置のためのモデル行列
     glm::mat4 model1 = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f,-2.0f,1.0f));
     model1 = glm::rotate(model1, (time*0.5f), glm::vec3(1,1,0));//固定軸周りのアニメーション
-    model1 = glm::scale(model1,glm::vec3(0.01,0.01,0.01));
+    model1 = glm::scale(model1,glm::vec3(10.0f,10.0f,10.0f));
 
     glm::mat4 model2 = glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f,0.0f,0.0f));
     //model2 = glm::rotate(model2, time*0.0f, glm::vec3(1,1,0));//固定軸周りのアニメーション
-    model2 = glm::scale(model2,glm::vec3(0.01,0.01,0.01));
+    model2 = glm::scale(model2,glm::vec3(10.0f,10.0f,10.0f));
     
 
     // 毎フレームカメラ更新
