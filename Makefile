@@ -9,7 +9,7 @@ IMGUI_SRC = imGUI/imgui/imgui.cpp imGUI/imgui/imgui_draw.cpp imGUI/imgui/imgui_w
 IMGUI_SRC_WEB = imGUI/imgui/imgui.cpp imGUI/imgui/imgui_draw.cpp imGUI/imgui/imgui_widgets.cpp imGUI/imgui/imgui_tables.cpp \
      imGUI/imgui/backends/imgui_impl_opengl3.cpp 
 IXWEB_SRC =  $(wildcard ixwebsocket/*.cpp)
-WINOPT = -lglu32 -lopengl32 -static -lstdc++ -lgcc -lpthread -lws2_32
+WINOPT = -lglu32 -lopengl32 -static -lstdc++ -lgcc -lpthread -lws2_32 -lz -lssl -lcrypto
 
 all:win64
 
@@ -22,13 +22,14 @@ win64:
 	-o app.exe
 
 linux:
-	$(CC)  $(APP_SRC) $(IMGUI_SRC) ./glad/src/glad.c \
+	$(CC)  $(APP_SRC) $(IMGUI_SRC)  $(IXWEB_SRC) ./glad/src/glad.c \
 	-I. -I./include -I./imGUI  -I./glm -I./glad/include \
 	-I/usr/X11R6/include \
+	-I./ixwebsocket -I./ixwebsocket/ixwebsocket \
 	-std=c++17 \
     -Wall -Wextra \
     -lglfw -lGL -ldl \
-	-lboost_system -lpthread -lssl -lcrypto \
+	-lssl -lcrypto -lz \
 	-DIMGUI_IMPL_OPENGL_LOADER_GLAD \
 	-o app.exe
 
@@ -50,6 +51,14 @@ linux-web:
 	-lwebsocket.js \
 	-O2 \
 	-o docs/index.html
+
+websocket-test:
+	g++ src/robot_server.cpp \
+	ixwebsocket/*.cpp \
+	-I. -IIXWebSocket -I./include \
+	-lz -lpthread \
+	-lssl -lcrypto \
+	-o websocket-server.exe
 
 clean:
 	rm *.o *.exe

@@ -25,4 +25,8 @@ public:
     double now_second = 0.0;
     std::string dumpText;
 
+    std::string uri = "ws://127.0.0.1:9002";
+    bool connecting = false;
+    bool connected = false;
+
 };

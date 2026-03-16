@@ -142,6 +142,41 @@ void Gui::draw(RobotState* rs)
         ImGui::DragFloat("x",&imgui_x);
         ImGui::DragFloat("y",&imgui_y);
     ImGui::End();
+
+    ImGui::SetNextWindowPos(ImVec2(210,0),ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(300,120),ImGuiCond_FirstUseEver);
+    ImGui::Begin("WebSocket");
+
+        static char uri_buf[256];
+        strncpy(uri_buf, uri.c_str(), sizeof(uri_buf));
+
+        ImGui::InputText("URI", uri_buf, sizeof(uri_buf));
+        uri = uri_buf;
+        if(!ws->isConnected())
+        {
+            if(ImGui::Button("Connect"))
+            {
+                ws->connect(uri);
+            }
+        }
+        else
+        {
+            ImGui::TextColored(ImVec4(0,1,0,1),"Connected");
+
+            if(ImGui::Button("Disconnect"))
+            {
+                ws->disconnect();
+            }
+        }
+        if(ws->isConnected())
+        {
+            if(ImGui::Button("Send RobotState JSON"))
+            {
+                std::string json = rs->to_json().dump();
+                ws->send(json);
+            }
+        }
+        ImGui::End();
 }
 
 void Gui::end()

@@ -95,6 +95,7 @@ make win64
 - Emscripten compiler https://emscripten.org/
 - nlohmann JSON https://github.com/nlohmann/json
 - WebSocket++ https://github.com/zaphoyd/websocketpp/
+- IXWebSocket 
 
 ---
 
