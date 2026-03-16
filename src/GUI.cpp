@@ -44,7 +44,9 @@ void Gui::setup(GLFWwindow* window)
     );
 
 }
+//---------------
 
+//----------------------
 void Gui::begin(GLFWwindow* window)
 {
     #ifdef __EMSCRIPTEN__
@@ -97,16 +99,24 @@ void Gui::draw(RobotState* rs)
 
         ImGui::SliderFloat2("JS", joy, -1.0f, 1.0f);
 
+        if(ImGui::Button("Dump JSON"))
+        {
+            dumpText = rs->to_json().dump(2);
+        }
+        ImGui::InputTextMultiline(
+            "##json",
+            dumpText.data(),
+            dumpText.size()+1,
+            ImVec2(400,300),
+            ImGuiInputTextFlags_ReadOnly
+        );
+
+
     ImGui::End();
 
     ImGui::SetNextWindowPos(ImVec2(0,110),ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize(ImVec2(200,350),ImGuiCond_FirstUseEver);
     ImGui::Begin(u8"W2 Joints");
-/*         for(int i=0;i<4;i++)
-        {
-            std::string label = "Leg" + std::to_string(i+1);
-            ImGui::SliderFloat3(label.c_str(), &joint[i].x, -3.14f, 3.14f);
-        } */
          for(int i=0;i<rs->joint.size();i++)
          {
             std::string label = "J" + std::to_string(i+1);

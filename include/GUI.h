@@ -23,4 +23,6 @@ public:
     glm::vec3 joint[4];
 
     double now_second = 0.0;
+    std::string dumpText;
+
 };
