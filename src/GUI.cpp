@@ -5,6 +5,15 @@
 #include "imgui_impl_opengl3.h"
 #include <string>
 
+#ifdef __EMSCRIPTEN__
+#include "BrowserWebSocket.h"
+#else
+#include "NativeWebSocket.h"
+#endif
+
+std::unique_ptr<IWebSocket> ws;
+
+
 void Gui::setup(GLFWwindow* window)
 {
     IMGUI_CHECKVERSION();
@@ -42,6 +51,13 @@ void Gui::setup(GLFWwindow* window)
         NULL,
         io.Fonts->GetGlyphRangesJapanese()
     );
+
+    #ifdef __EMSCRIPTEN__
+    ws = std::make_unique<BrowserWebSocket>();
+    #else
+    ws = std::make_unique<NativeWebSocket>();
+    #endif
+
 
 }
 //---------------

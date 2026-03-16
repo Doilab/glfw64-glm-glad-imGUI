@@ -3,12 +3,12 @@ CC=g++
 CC_MINGW64VSC =..\TOOLS\mingw64\bin\g++
 
 APP_SRC = ./src/App.cpp ./src/Renderer.cpp ./src/main.cpp ./src/Camera.cpp \
-	./src/Model.cpp ./src/ModelBuilder.cpp ./src/SceneObject.cpp ./src/GUI.cpp ./src/Robot.cpp
+	./src/Model.cpp ./src/ModelBuilder.cpp ./src/SceneObject.cpp ./src/GUI.cpp ./src/Robot.cpp 
 IMGUI_SRC = imGUI/imgui/imgui.cpp imGUI/imgui/imgui_draw.cpp imGUI/imgui/imgui_widgets.cpp imGUI/imgui/imgui_tables.cpp \
     imGUI/imgui/backends/imgui_impl_glfw.cpp imGUI/imgui/backends/imgui_impl_opengl3.cpp 
 IMGUI_SRC_WEB = imGUI/imgui/imgui.cpp imGUI/imgui/imgui_draw.cpp imGUI/imgui/imgui_widgets.cpp imGUI/imgui/imgui_tables.cpp \
      imGUI/imgui/backends/imgui_impl_opengl3.cpp 
-WINOPT = -lglu32 -lopengl32 -static -lstdc++ -lgcc
+WINOPT = -lglu32 -lopengl32 -static -lstdc++ -lgcc -lboost_system -lpthread
 
 all:win64
 
@@ -26,6 +26,7 @@ linux:
 	-std=c++17 \
     -Wall -Wextra \
     -lglfw -lGL -ldl \
+	-lboost_system -lpthread -lssl -lcrypto \
 	-DIMGUI_IMPL_OPENGL_LOADER_GLAD \
 	-o app.exe
 
@@ -44,6 +45,7 @@ linux-web:
 	--preload-file assets \
 	--preload-file shaders \
 	-Wno-nontrivial-memcall \
+	-lwebsocket.js \
 	-O2 \
 	-o docs/index.html
 

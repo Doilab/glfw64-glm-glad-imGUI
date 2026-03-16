@@ -82,6 +82,7 @@ make linux
 
 make win64
 
+(WebSocketあたりから未確認)
 
 ---
 
@@ -93,6 +94,7 @@ make win64
 - Dear ImGui (debug UI) https://github.com/ocornut/imgui
 - Emscripten compiler https://emscripten.org/
 - nlohmann JSON https://github.com/nlohmann/json
+- WebSocket++ https://github.com/zaphoyd/websocketpp/
 
 ---
 
