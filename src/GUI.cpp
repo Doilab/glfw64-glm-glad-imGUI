@@ -8,7 +8,8 @@
 #ifdef __EMSCRIPTEN__
 #include "BrowserWebSocket.h"
 #else
-#include "NativeWebSocket.h"
+//#include "NativeWebSocket.h"
+#include "IXWebSocket.h"
 #endif
 
 std::unique_ptr<IWebSocket> ws;

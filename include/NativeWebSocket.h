@@ -1,13 +1,17 @@
 #ifndef __EMSCRIPTEN__
 
-#include <websocketpp/client.hpp>
+#define ASIO_STANDALONE
+#define _WEBSOCKETPP_CPP11_STL_
+#include <asio.hpp>
 #include <websocketpp/config/asio_client.hpp>
+#include <websocketpp/client.hpp>
+
+#include <queue>
 #include "IWebSocket.h"
 
 class NativeWebSocket : public IWebSocket
 {
-    typedef websocketpp::client<
-        websocketpp::config::asio_client> client;
+    typedef websocketpp::client<websocketpp::config::asio_client> client;
 
     client c;
     websocketpp::connection_hdl hdl;

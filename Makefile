@@ -8,13 +8,15 @@ IMGUI_SRC = imGUI/imgui/imgui.cpp imGUI/imgui/imgui_draw.cpp imGUI/imgui/imgui_w
     imGUI/imgui/backends/imgui_impl_glfw.cpp imGUI/imgui/backends/imgui_impl_opengl3.cpp 
 IMGUI_SRC_WEB = imGUI/imgui/imgui.cpp imGUI/imgui/imgui_draw.cpp imGUI/imgui/imgui_widgets.cpp imGUI/imgui/imgui_tables.cpp \
      imGUI/imgui/backends/imgui_impl_opengl3.cpp 
-WINOPT = -lglu32 -lopengl32 -static -lstdc++ -lgcc -lboost_system -lpthread
+IXWEB_SRC =  $(wildcard ixwebsocket/*.cpp)
+WINOPT = -lglu32 -lopengl32 -static -lstdc++ -lgcc -lpthread -lws2_32
 
 all:win64
 
 win64:
-	$(CC_MINGW64VSC) $(APP_SRC)   $(IMGUI_SRC) ./glad/src/glad.c \
+	$(CC_MINGW64VSC) $(APP_SRC)   $(IMGUI_SRC) $(IXWEB_SRC) ./glad/src/glad.c \
 	-I. -I./include -I./imGUI  -I./glm -I./glad/include \
+	-I./ixwebsocket \
 	-DWIN32  \
 	./GLFW/lib64/libglfw3dll.a  $(WINOPT) \
 	-o app.exe
