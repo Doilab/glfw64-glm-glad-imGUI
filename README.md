@@ -28,7 +28,7 @@ This project provides a simple structure for experimenting with OpenGL rendering
 https://doilab.github.io/glfw64-glm-glad-imGUI/
 
 
-## Emscriptenをローカルで試す場合
+## WebGLをローカルで試す場合
 
 別ターミナルで
 
@@ -104,7 +104,6 @@ make win64
 
 ## Future improvements
 
-- JSON support
 - WebSocket
 - Menu
 
