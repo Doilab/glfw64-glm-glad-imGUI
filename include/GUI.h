@@ -3,10 +3,15 @@
 #include "GLHeaders.h"
 #include "Robot.h"
 #include <glm/glm.hpp>
+#include <queue>
+#include <mutex>
+
 
 class Gui
 {
 public:
+    std::queue<RobotState> recvQueue;
+    std::mutex queueMutex;
 
     void setup(GLFWwindow* window);
     void begin(GLFWwindow* window);

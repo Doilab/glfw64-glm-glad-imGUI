@@ -99,6 +99,42 @@ void Gui::draw(RobotState* rs)
 {
     ImGui::SetNextWindowPos(ImVec2(0,0),ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize(ImVec2(200,100),ImGuiCond_FirstUseEver);
+
+    // ===== WebSocket受信処理 =====
+    if(ws)
+    {
+        ws->poll(); // （Emscripten用、ネイティブは何もしない）
+
+        while(ws->hasMessage())
+        {
+            std::string msg = ws->popMessage();
+
+            try
+            {
+                nlohmann::json j =nlohmann::json::parse(msg);
+                RobotState newState = RobotState::from_json(j);
+
+                // サイズチェック
+                if(rs->joint.size() == newState.joint.size())
+                {
+                    for(size_t i = 0; i < rs->joint.size(); i++)
+                    {
+                        rs->joint[i] = newState.joint[i];
+                    }
+                }
+                else
+                {
+                    std::cout << "Size mismatch\n";
+                }
+
+                //std::cout << "received Gui::draw()\n";
+            }
+            catch(...)
+            {
+                std::cout << "JSON parse error\n";
+            }
+        }
+    }
     ImGui::Begin(u8"W1 update260315");
 
         ImGui::Text("経過時間 %.2f", now_second);

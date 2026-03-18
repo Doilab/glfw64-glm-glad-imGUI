@@ -402,7 +402,7 @@ void App::mainLoop()
     renderer.draw(yAxis, model1, glm::vec3(0,1,0), GL_LINES);
     renderer.draw(zAxis, model1, glm::vec3(0,0,1), GL_LINES);
     
-    update(time);//関節角レベルでのアニメーション
+    //update(time);//関節角レベルでのアニメーション
 
     //SceneObject（階層構造あり）描画
     root->draw(renderer, model2);

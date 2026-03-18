@@ -49,20 +49,54 @@ struct RobotState
     {
         RobotState s;
 
-        s.id = j["id"];
+        if (!j.is_object())
+        {
+            std::cout << "JSON is not object\n";
+            return s;
+        }
 
-        auto p = j["position"];
-        s.position = glm::vec3(p[0], p[1], p[2]);
+        // id
+        if (j.contains("id"))
+        {
+            s.id = j["id"];
+        }
 
-        auto q = j["orientation"];
-        s.orientation = glm::quat(q[0], q[1], q[2], q[3]);
+        // position
+        if (j.contains("position") && j["position"].is_array() && j["position"].size() >= 3)
+        {
+            auto& p = j["position"];
+            s.position = glm::vec3(p[0], p[1], p[2]);
+        }
 
-        s.joint = j["joint"].get<std::vector<float>>();
+        // orientation
+        if (j.contains("orientation") && j["orientation"].is_array() && j["orientation"].size() >= 4)
+        {
+            auto& q = j["orientation"];
+            s.orientation = glm::quat(q[0], q[1], q[2], q[3]);
+        }
 
-        s.time = j["time"];
+        // joint
+        if (j.contains("joint") && j["joint"].is_array())
+        {
+            try
+            {
+                s.joint = j["joint"].get<std::vector<float>>();
+            }
+            catch (std::exception& e)
+            {
+                std::cout << "joint parse error: " << e.what() << std::endl;
+            }
+        }
+
+        // time
+        if (j.contains("time"))
+        {
+            s.time = j["time"];
+        }
 
         return s;
     }
+
     void dumpRobotState(const RobotState& s)
     {
         std::cout << s.to_json().dump(2) << std::endl;
