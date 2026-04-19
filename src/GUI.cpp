@@ -101,7 +101,7 @@ void Gui::draw(RobotState* rs)
     ImGui::SetNextWindowSize(ImVec2(200,100),ImGuiCond_FirstUseEver);
 
     // ===== WebSocket受信処理 =====
-    if(ws)
+    if((ws)&&(ws->isConnected() ))
     {
         ws->poll(); // （Emscripten用、ネイティブは何もしない）
 
@@ -120,6 +120,7 @@ void Gui::draw(RobotState* rs)
                     for(size_t i = 0; i < rs->joint.size(); i++)
                     {
                         rs->joint[i] = newState.joint[i];
+                        ;
                     }
                 }
                 else
@@ -135,7 +136,7 @@ void Gui::draw(RobotState* rs)
             }
         }
     }
-    ImGui::Begin(u8"W1 update260315");
+    ImGui::Begin(u8"W1 update260417");
 
         ImGui::Text("経過時間 %.2f", now_second);
 
@@ -169,7 +170,7 @@ void Gui::draw(RobotState* rs)
 
     ImGui::SetNextWindowPos(ImVec2(0,110),ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize(ImVec2(200,350),ImGuiCond_FirstUseEver);
-    ImGui::Begin(u8"W2 Joints");
+    ImGui::Begin(u8"W2 Joints[rad]");
          for(int i=0;i<rs->joint.size();i++)
          {
             std::string label = "J" + std::to_string(i+1);

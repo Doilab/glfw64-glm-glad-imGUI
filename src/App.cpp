@@ -403,6 +403,7 @@ void App::mainLoop()
     renderer.draw(zAxis, model1, glm::vec3(0,0,1), GL_LINES);
     
     //update(time);//関節角レベルでのアニメーション
+    robot1.update();//ロボットの状態を更新（関節角→姿勢変換）
 
     //SceneObject（階層構造あり）描画
     root->draw(renderer, model2);
