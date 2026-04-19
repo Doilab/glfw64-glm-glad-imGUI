@@ -136,7 +136,7 @@ void Gui::draw(RobotState* rs)
             }
         }
     }
-    ImGui::Begin(u8"W1 update260417");
+    ImGui::Begin(u8"W1 update260419");
 
         ImGui::Text("経過時間 %.2f", now_second);
 
