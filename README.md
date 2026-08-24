@@ -1,8 +1,6 @@
 # OpenGL GLFW + GLAD + GLM + Dear ImGui + IXWebSocket Template
-A minimal OpenGL starter project using:
-# モダンOpenGLのテスト
+A minimal Modern OpenGL starter project
 2026.3.1 -
-
 
 This project provides a simple structure for experimenting with OpenGL rendering.
 
@@ -16,6 +14,7 @@ This project provides a simple structure for experimenting with OpenGL rendering
 - Simple Model / Renderer structure
 - Edge rendering for mesh visualization
 - IXWebSocket interface
+- Multi platform (Windows/Linux/WebGL)
 
 ---
 
@@ -24,24 +23,12 @@ This project provides a simple structure for experimenting with OpenGL rendering
 ![screenshot](docs/screenshot.png)
 
 ---
-## EmscriptenによるWebGL化
+## WebGL program by Emscripten compiler
 
 https://doilab.github.io/glfw64-glm-glad-imGUI/
 
 
-## WebGLをローカルで試す場合
 
-別ターミナルで
-
-python3 -m http.server 8080
-
-ブラウザで
-
-localhost:8080
-
-にアクセス
-
----
 
 ## Project Structure
 
@@ -69,24 +56,24 @@ HTML files
 ## Build
 
 ### Web(em++)
-
-
+```
 make linux-web
+```
 
 ### Linux (g++)
-
-
+```
 make linux
+```
 
 ### Windows (MinGW g++)
-
-
+```
 make win64
+```
 
 ### Linux websocket server (g++)
-
-
+```
 make websocket-test
+```
 
 ---
 
@@ -102,12 +89,25 @@ make websocket-test
 - IXWebSocket 
 
 ---
+## WebGLをローカルで試す場合
+
+別ターミナルで
+```
+python3 -m http.server 8080
+```
+ブラウザで
+```
+localhost:8080
+```
+にアクセス
+
+
+
+---
 ## Tips
 ~/.zshrcに以下追記しておく．
-
-
-emdev
-と実行しただけでemscriptenにパスが通り，サーバーが起動し，VSCodeが実行される．
+`emdev`
+と実行しただけでemscriptenにパスが通り，ローカルWebサーバーが起動し，VSCodeが実行される．
 
 ```
 emdev() {
@@ -120,7 +120,7 @@ emdev() {
 
     cd "$DEV" || return
 
-    # サーバー起動（既に起動していない場合）
+    # Webサーバー起動（起動していない場合）
     if ! lsof -i :$PORT >/dev/null 2>&1; then
         (cd "$DOCS" && python3 -m http.server $PORT) &
         echo "Web server started: http://localhost:$PORT"
@@ -132,12 +132,22 @@ emdev() {
 }
 ```
 
-
+---
 ## Future improvements
 
 - WebSocket test
 - Animation
 - Menu
+
+
+---
+## 概略をつかむには
+App.cppに全体の流れがあるので参照する．
+
+## 視点移動（今後変更の可能性あり）
+- 左右矢印キー　パン
+- 上下矢印キー　視点の高さ変更
+- PageUp/Down ズーム
 
 
 ---
