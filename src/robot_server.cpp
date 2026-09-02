@@ -132,14 +132,12 @@ int main()
 
             {
                 std::lock_guard<std::mutex> lock(stateMutex);
-                copy = latestState;
-            }
+                for(auto& joint : latestState.joint)
+                {
+                    joint += 0.1f;
+                }
 
-            // テスト用に動かす
-            for(auto& j : copy.joint)
-            {
-                j += 0.1f;
-                ;
+                copy = latestState;
             }
 
             //copy.joint[4] = 0.5f; // J4は固定debug
